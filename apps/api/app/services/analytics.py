@@ -24,10 +24,11 @@ QUERIES = {
     "carbon/heatmap": CARBON + "SELECT day,hour,avg(value) AS value FROM base GROUP BY 1,2 ORDER BY 1,2",
     "carbon/comparison": """WITH periods AS (
  SELECT CASE WHEN period_start>=:start THEN 'current' ELSE 'previous' END AS period,
- CASE WHEN region_id=0 THEN actual ELSE forecast END AS value
+ CASE WHEN region_id=0 THEN actual ELSE forecast END AS value,period_start
  FROM core.carbon_observation WHERE region_id=:region AND period_start>=:start-(CAST(:end AS timestamptz)-CAST(:start AS timestamptz)) AND period_start<:end
 ) SELECT period,avg(value) AS mean,min(value) AS minimum,max(value) AS maximum,stddev_samp(value) AS volatility,
- percentile_cont(0.5) WITHIN GROUP(ORDER BY value) AS p50,percentile_cont(0.95) WITHIN GROUP(ORDER BY value) AS p95,count(value) AS observations
+ percentile_cont(0.5) WITHIN GROUP(ORDER BY value) AS p50,percentile_cont(0.95) WITHIN GROUP(ORDER BY value) AS p95,count(value) AS observations,
+ CASE WHEN count(value)>0 THEN (array_agg(period_start ORDER BY value DESC NULLS LAST))[1] END AS peak_interval
  FROM periods GROUP BY period""",
     "generation/mix": """SELECT fuel_id,label,colour,renewable,low_carbon,fossil,avg(share) AS share,count(*) AS observations
  FROM mart.v_generation_mix WHERE region_id=:region AND period_start>=:start AND period_start<:end AND (CAST(:fuel AS text) IS NULL OR fuel_id=:fuel)
@@ -36,6 +37,15 @@ QUERIES = {
  SELECT period_start,sum(share) FILTER(WHERE low_carbon) AS low_carbon,sum(share) FILTER(WHERE renewable) AS renewable,
  sum(share) FILTER(WHERE fossil) AS fossil FROM mart.v_generation_mix WHERE region_id=:region AND period_start>=:start AND period_start<:end
  GROUP BY period_start) SELECT avg(low_carbon) AS low_carbon,avg(renewable) AS renewable,avg(fossil) AS fossil FROM intervals""",
+    "generation/volatility": """SELECT fuel_id,avg(share) AS mean_share,stddev_samp(share) AS volatility,min(share) AS minimum,max(share) AS maximum,
+    avg(share) FILTER(WHERE period_start>=:start)-avg(share) FILTER(WHERE period_start<:start) AS change_pp
+    FROM core.generation_share WHERE region_id=:region AND period_start>=:start-(CAST(:end AS timestamptz)-CAST(:start AS timestamptz)) AND period_start<:end
+    AND (CAST(:fuel AS text) IS NULL OR fuel_id=:fuel) GROUP BY fuel_id ORDER BY volatility DESC NULLS LAST""",
+    "generation/profile": """WITH fuel_intervals AS (
+    SELECT period_start,fuel_id,sum(power_mw) AS power_mw FROM core.generation_outturn WHERE period_start>=:start AND period_start<:end
+    AND (CAST(:fuel AS text) IS NULL OR fuel_id=:fuel) GROUP BY 1,2)
+    SELECT extract(hour FROM period_start AT TIME ZONE 'Europe/London')::int AS hour,fuel_id,avg(power_mw) AS power_mw
+    FROM fuel_intervals GROUP BY 1,2 ORDER BY 1,2""",
     "demand/summary": """SELECT avg(national_mw) AS mean,min(national_mw) AS minimum,max(national_mw) AS peak,
  stddev_samp(national_mw) AS volatility,avg(transmission_mw) AS transmission_mean,
  percentile_cont(0.95) WITHIN GROUP(ORDER BY national_mw) AS p95,count(*) AS observations
@@ -44,6 +54,7 @@ QUERIES = {
     "demand/comparison": """SELECT CASE WHEN period_start>=:start THEN 'current' ELSE 'previous' END AS period,
  avg(national_mw) AS mean,max(national_mw) AS peak,stddev_samp(national_mw) AS volatility
  FROM core.demand_observation WHERE observation_kind='A' AND period_start>=:start-(CAST(:end AS timestamptz)-CAST(:start AS timestamptz)) AND period_start<:end GROUP BY 1""",
+    "demand/distribution": "SELECT floor(national_mw/1000)*1000 AS bucket,count(*) AS observations FROM core.demand_observation WHERE observation_kind='A' AND period_start>=:start AND period_start<:end AND national_mw IS NOT NULL GROUP BY 1 ORDER BY 1",
     "regions": "SELECT * FROM core.region ORDER BY id",
     "regions/ranking": """WITH summary AS (
  SELECT r.id,r.name,avg(c.forecast) AS value,stddev_samp(c.forecast) AS volatility,
@@ -144,7 +155,7 @@ def dynamic_query(route, filters):
     if route == "carbon/drilldown":
         return (
             CARBON
-            + f"SELECT period_start AS time,actual,forecast,value,intensity_index,source_id,response_id,updated_at FROM base ORDER BY time {order} LIMIT :limit OFFSET :offset"
+            + f"SELECT period_start AS time,actual,forecast,value,intensity_index,source_id,response_id,updated_at,ROW_NUMBER() OVER(ORDER BY value DESC NULLS LAST) AS intensity_rank FROM base ORDER BY time {order} LIMIT :limit OFFSET :offset"
         )
     return QUERIES[route]
 

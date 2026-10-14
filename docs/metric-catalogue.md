@@ -18,10 +18,11 @@ All calculations execute in PostgreSQL; API query identifiers below map directly
 ```sql
 WITH periods AS (
  SELECT CASE WHEN period_start>=:start THEN 'current' ELSE 'previous' END AS period,
- CASE WHEN region_id=0 THEN actual ELSE forecast END AS value
+ CASE WHEN region_id=0 THEN actual ELSE forecast END AS value,period_start
  FROM core.carbon_observation WHERE region_id=:region AND period_start>=:start-(CAST(:end AS timestamptz)-CAST(:start AS timestamptz)) AND period_start<:end
 ) SELECT period,avg(value) AS mean,min(value) AS minimum,max(value) AS maximum,stddev_samp(value) AS volatility,
- percentile_cont(0.5) WITHIN GROUP(ORDER BY value) AS p50,percentile_cont(0.95) WITHIN GROUP(ORDER BY value) AS p95,count(value) AS observations
+ percentile_cont(0.5) WITHIN GROUP(ORDER BY value) AS p50,percentile_cont(0.95) WITHIN GROUP(ORDER BY value) AS p95,count(value) AS observations,
+ CASE WHEN count(value)>0 THEN (array_agg(period_start ORDER BY value DESC NULLS LAST))[1] END AS peak_interval
  FROM periods GROUP BY period
 ```
 

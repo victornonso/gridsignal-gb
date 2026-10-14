@@ -56,7 +56,6 @@ def main():
             "ops.quality_result",
         ]:
             report["counts"][name] = conn.execute(text(f"SELECT count(*) FROM {name}")).scalar()
-        report["counts"]["raw.api_response"] = "Requires migration/writer role; checked separately."
         report["source_status"] = [
             dict(r) for r in conn.execute(text("SELECT * FROM mart.v_source_freshness")).mappings()
         ]
@@ -65,6 +64,30 @@ def main():
                 "EXPLAIN (ANALYZE,BUFFERS,FORMAT JSON) SELECT avg(actual) FROM core.carbon_observation WHERE region_id=0 AND period_start>='2026-10-01' AND period_start<'2026-10-14'"
             )
         ).scalar()
+    with create_engine(settings.database_url).connect() as conn:
+        report["counts"]["raw.api_response"] = conn.execute(
+            text("SELECT count(*) FROM raw.api_response")
+        ).scalar()
+        report["counts"]["raw.quarantine"] = conn.execute(
+            text("SELECT count(*) FROM raw.quarantine")
+        ).scalar()
+        report["counts"]["core.observation_revision"] = conn.execute(
+            text("SELECT count(*) FROM core.observation_revision")
+        ).scalar()
+        report["runs_by_source"] = [
+            dict(r)
+            for r in conn.execute(
+                text(
+                    "SELECT source_id,status,count(*) AS runs FROM ops.ingestion_run GROUP BY 1,2 ORDER BY 1,2"
+                )
+            ).mappings()
+        ]
+    report["deployment"] = {
+        "public_url": None,
+        "status": "Blocked: persistent backend/database/worker hosting credentials and budget required",
+        "local_dashboard": "http://127.0.0.1:3001",
+        "local_api": "http://127.0.0.1:8001",
+    }
     path = Path("docs/verification.json")
     path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     failures = [k for k, v in report["endpoints"].items() if v["status"] != 200]

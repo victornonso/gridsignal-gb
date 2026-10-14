@@ -66,3 +66,16 @@ def test_unknown_elexon_fuel_is_not_silently_classified():
         )
     )
     assert rows[0][0] == "quarantine"
+
+
+def test_schema_drift_records_malformed_collection():
+    from pipelines.validation.contracts import contract_drift
+
+    assert contract_drift("carbon", {"data": [None, {"from": "2026-10-01"}]})
+    assert contract_drift("carbon", {"wrong": []})
+
+
+def test_historical_metadata_is_not_a_demand_fact():
+    from pipelines.validation.contracts import contract_drift
+
+    assert contract_drift("demand", {"result": {"resources": []}}) == []

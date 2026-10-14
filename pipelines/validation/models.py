@@ -35,6 +35,12 @@ class FuelOutturn(BaseModel):
     fuelType: str
     generation: float  # Signed interconnector flows are valid.
 
+    @model_validator(mode="after")
+    def aware_timestamps(self):
+        if not self.startTime.tzinfo or (self.publishTime and not self.publishTime.tzinfo):
+            raise ValueError("Elexon timestamps must include an offset")
+        return self
+
 
 class DemandRecord(BaseModel):
     SETTLEMENT_DATE: date

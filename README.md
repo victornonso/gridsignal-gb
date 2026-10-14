@@ -76,7 +76,7 @@ Dashboard: `http://127.0.0.1:3001`. API/OpenAPI: `http://127.0.0.1:8001/docs`. D
 
 To run the full topology in containers: `docker compose up --build -d`. The migration service runs before the API/worker. `docker compose --profile tools up -d pgadmin` adds pgAdmin at `http://127.0.0.1:5051`; register host `db`, port `5432`, database `gridsignal_db`, and the appropriate role. Do not expose pgAdmin publicly.
 
-Docker Desktop failed to initialise on the initial build machine. An isolated native PostgreSQL 18 fallback was provisioned and verified there using `tools/local_postgres.py`; its data lives in ignored `.local/pgdata`. Native binaries are not committed. This fallback does not imply Docker image builds have passed.
+Docker Desktop failed to initialise on the initial build machine. An isolated native PostgreSQL 18 fallback was provisioned and verified there using `tools/local_postgres.py`; its data lives in ignored `.local/pgdata`. Native binaries are not committed. Both Docker image builds and PostgreSQL-container integration checks subsequently passed in GitHub Actions; the local Desktop startup issue remains separate.
 
 ## Backfills and operations
 

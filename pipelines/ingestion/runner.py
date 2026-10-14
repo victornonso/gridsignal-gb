@@ -2,8 +2,9 @@ import hashlib
 import json
 import logging
 from datetime import datetime, timedelta
+from threading import RLock
 
-from sqlalchemy import MetaData, Table, create_engine, text
+from sqlalchemy import MetaData, Table, and_, create_engine, or_, text
 from sqlalchemy.dialects.postgresql import insert
 
 from apps.api.app.config import settings
@@ -15,6 +16,7 @@ from pipelines.validation.models import CarbonInterval, DemandRecord, FuelOuttur
 log = logging.getLogger("gridsignal.ingestion")
 engine = create_engine(settings.database_url, pool_pre_ping=True, pool_size=3, max_overflow=2)
 metadata = MetaData()
+metadata_lock = RLock()
 FUEL_MAP = {"CCGT": "gas", "OCGT": "gas", "NPSHYD": "hydro", "PS": "pumped_storage"}
 SOURCES = ("carbon", "regional", "mix", "elexon", "demand", "factors")
 
@@ -25,9 +27,10 @@ def hash_record(record):
 
 def table(conn, name, schema="core"):
     key = f"{schema}.{name}"
-    if key not in metadata.tables:
-        Table(name, metadata, schema=schema, autoload_with=conn)
-    return metadata.tables[key]
+    with metadata_lock:
+        if key not in metadata.tables:
+            Table(name, metadata, schema=schema, autoload_with=conn)
+        return metadata.tables[key]
 
 
 def upsert(conn, name, record, keys):
@@ -35,10 +38,16 @@ def upsert(conn, name, record, keys):
     statement = insert(obj).values(**record)
     updates = {k: getattr(statement.excluded, k) for k in record if k not in keys}
     updates["updated_at"] = text("now()")
+    condition = obj.c.record_hash != statement.excluded.record_hash
+    if name == "generation_outturn":
+        condition = and_(
+            condition,
+            or_(obj.c.published_at.is_(None), statement.excluded.published_at >= obj.c.published_at),
+        )
     result = conn.execute(
-        statement.on_conflict_do_update(
-            index_elements=keys, set_=updates, where=obj.c.record_hash != statement.excluded.record_hash
-        ).returning(text("(xmax=0) AS inserted"))
+        statement.on_conflict_do_update(index_elements=keys, set_=updates, where=condition).returning(
+            text("(xmax=0) AS inserted")
+        )
     ).first()
     return "duplicates" if result is None else ("inserted" if result.inserted else "updated")
 
@@ -52,6 +61,9 @@ def normalise(source, body, start, end):
         data = body["result"]["records"]
     if isinstance(data, dict):
         data = [data]
+    if source == "elexon":
+        # API publication order is descending; apply older versions first.
+        data = sorted(data, key=lambda item: str(item.get("publishTime") or ""))
     for item in data:
         try:
             if source == "carbon":
@@ -207,6 +219,7 @@ def ingest(source, start, end):
                     text("UPDATE ops.ingestion_run SET status='skipped',finished_at=now() WHERE id=:id"),
                     {"id": run},
                 )
+            client.close()
             return stats
         try:
             raw_ids = []

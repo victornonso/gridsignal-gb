@@ -1,0 +1,58 @@
+# GridSignal verification report
+
+Verified locally on 14 October 2026. The production build was served by Next.js standalone and queried the running FastAPI/PostgreSQL system.
+
+## Completed verification
+
+- 29 Python/API/database tests passed, including real temporary-database migrations, isolated failure/rollback tests, source locks and revision ordering.
+- 30 Playwright checks passed against the production build across desktop, tablet and mobile Chromium (59.4 seconds). All seven screens, navigation, date/region/resolution filters, comparisons, operational drilldowns, CSV downloads and explicit outage states passed.
+- 38 analytical API routes returned HTTP 200. Process liveness/readiness and metadata were also checked.
+- Full filtered CSV export returned 336 rows matching the SQL count even when the table request included a limit of 10 and offset of 50.
+- A repeated historical carbon window produced 49 duplicates, zero inserts, zero updates and zero rejected records.
+- Scheduled worker jobs fetched real source changes and persisted both new observations and revisions.
+- Python lint, frontend lint, TypeScript checks and the Next.js production build passed.
+- First hosted CI run 38540112974 passed Python/database, frontend/Docker and end-to-end jobs. Final refinement CI includes a full Docker Compose integration job and is recorded after execution.
+
+## Persisted row counts
+
+| Relation | Rows |
+|---|---:|
+| `core.carbon_observation` | 11,556 |
+| `core.generation_share` | 104,004 |
+| `core.generation_outturn` | 12,840 |
+| `core.demand_observation` | 1,584 |
+| `core.carbon_revision` | 108 |
+| `ops.ingestion_run` | 66 |
+| `ops.quality_result` | 360 |
+| `raw.api_response` | 76 |
+| `raw.quarantine` | 0 |
+| `core.observation_revision` | 506 |
+
+## Measured local API performance
+
+20 sequential HTTP requests per route; warm pool, loaded data. These are local measurements, not production guarantees.
+
+| Route | Median ms | p95 ms |
+|---|---:|---:|
+| `overview` | 15.15 | 27.95 |
+| `carbon/trend` | 8.01 | 9.81 |
+| `regions/ranking` | 14.2 | 20.26 |
+
+The actual query-plan JSON, source timestamps and route-level evidence are in `verification.json`.
+
+## Contract and data evidence
+
+Official NESO Carbon Intensity, regional, mix, factor and demand APIs and Elexon FUELHH were executed successfully. Historical NESO resource discovery and a 2025 backfill were also exercised. Original HTTP JSON responses are stored in `raw.api_response`; source contracts and genuine samples are versioned in `docs/contracts/`. Regional map geometry has a verified official source, licence and transformation record.
+
+## Deployment status
+
+- GitHub: private repository `https://github.com/victornonso/gridsignal-gb`.
+- Local dashboard: `http://127.0.0.1:3001`.
+- Local API docs: `http://127.0.0.1:8001/docs`.
+- Public deployment: **not deployed**. Authenticated persistent PostgreSQL/API/worker hosting and a budget are still required. Vercel authentication is available for the frontend, but a disconnected frontend is not being published as the complete application.
+- Local Docker Desktop cannot initialise its inference socket. Native PostgreSQL 18 is verified locally; both Docker image builds and a PostgreSQL container were verified independently in CI.
+- A saved browser permission blocked subsequent interactive preview opening. The recorded 30-check production browser run had already completed successfully before that block. No browser workaround was used.
+
+## Remaining operational acceptance
+
+Provision authenticated persistent hosting, migrate and backfill its database, configure exact production origins/secrets, run the worker, deploy the frontend against that API, verify HTTPS and production freshness, configure hosted backup storage/retention and repeat the deployment smoke checks. Native Safari/WebKit was not tested; tablet/mobile checks used Chromium device emulation. Full historical issue-time forecast skill is unsupported because the source does not provide those retained vintages.

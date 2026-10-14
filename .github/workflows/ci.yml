@@ -97,3 +97,34 @@ jobs:
         if: always()
         with: {name: browser-verification,path: 'apps/dashboard/playwright-report/'}
 
+  compose-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provision complete topology
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker compose up --build -d
+      - name: Verify container readiness and automatic ingestion
+        run: |
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8001/api/v1/health/ready >/dev/null && break; sleep 2; done
+          curl -fsS http://127.0.0.1:3001 >/dev/null
+          for i in $(seq 1 60); do
+            count=$(docker compose exec -T api python -c "from apps.api.app.db.session import read_engine; from sqlalchemy import text; c=read_engine.connect(); print(c.execute(text(\"SELECT count(DISTINCT source_id) FROM ops.ingestion_run WHERE status='success'\")).scalar())")
+            if [ "$count" = "6" ]; then break; fi
+            sleep 2
+          done
+          test "$count" = "6"
+          curl -fsS http://127.0.0.1:3001/api/v1/overview > /tmp/compose-overview.json
+          python -c "import json; d=json.load(open('/tmp/compose-overview.json')); assert d['rows'][0]['latest'] is not None"
+      - name: Capture container logs
+        if: always()
+        run: docker compose logs --no-color > /tmp/compose.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: compose-verification,path: /tmp/compose.log}
+      - name: Stop isolated CI services
+        if: always()
+        run: docker compose down
+

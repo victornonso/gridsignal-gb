@@ -1,179 +1,194 @@
 {
-  "verified_at": "2026-10-14T09:03:30.631624+00:00",
+  "verified_at": "2026-10-14T09:19:58.547647+00:00",
   "endpoints": {
     "carbon/latest": {
       "status": 200,
-      "duration_ms": 418.37,
+      "duration_ms": 14.13,
       "rows": 1
     },
     "carbon/distribution": {
       "status": 200,
-      "duration_ms": 9.11,
+      "duration_ms": 11.08,
       "rows": 12
     },
     "carbon/profile": {
       "status": 200,
-      "duration_ms": 9.86,
+      "duration_ms": 9.24,
       "rows": 48
     },
     "carbon/heatmap": {
       "status": 200,
-      "duration_ms": 13.06,
+      "duration_ms": 12.84,
       "rows": 320
     },
     "carbon/comparison": {
       "status": 200,
-      "duration_ms": 7.52,
+      "duration_ms": 10.18,
       "rows": 2
     },
     "generation/mix": {
       "status": 200,
-      "duration_ms": 14.35,
+      "duration_ms": 13.86,
       "rows": 9
     },
     "generation/summary": {
       "status": 200,
-      "duration_ms": 11.99,
+      "duration_ms": 12.62,
       "rows": 1
+    },
+    "generation/volatility": {
+      "status": 200,
+      "duration_ms": 11.36,
+      "rows": 9
+    },
+    "generation/profile": {
+      "status": 200,
+      "duration_ms": 28.48,
+      "rows": 240
     },
     "demand/summary": {
       "status": 200,
-      "duration_ms": 7.49,
+      "duration_ms": 9.04,
       "rows": 1
     },
     "demand/hourly": {
       "status": 200,
-      "duration_ms": 13.68,
+      "duration_ms": 10.59,
       "rows": 48
     },
     "demand/comparison": {
       "status": 200,
-      "duration_ms": 8.63,
+      "duration_ms": 10.23,
       "rows": 2
+    },
+    "demand/distribution": {
+      "status": 200,
+      "duration_ms": 7.3,
+      "rows": 18
     },
     "regions": {
       "status": 200,
-      "duration_ms": 8.42,
+      "duration_ms": 8.17,
       "rows": 18
     },
     "regions/ranking": {
       "status": 200,
-      "duration_ms": 16.65,
+      "duration_ms": 21.69,
       "rows": 14
     },
     "forecasts/errors": {
       "status": 200,
-      "duration_ms": 9.16,
+      "duration_ms": 8.85,
       "rows": 1
     },
     "forecasts/distribution": {
       "status": 200,
-      "duration_ms": 8.08,
+      "duration_ms": 9.18,
       "rows": 15
     },
     "forecasts/hourly": {
       "status": 200,
-      "duration_ms": 12.48,
+      "duration_ms": 9.44,
       "rows": 24
     },
     "forecasts/weekday": {
       "status": 200,
-      "duration_ms": 8.22,
+      "duration_ms": 9.07,
       "rows": 7
     },
     "forecasts/revisions": {
       "status": 200,
-      "duration_ms": 12.82,
+      "duration_ms": 11.85,
       "rows": 108
     },
     "operations/sources": {
       "status": 200,
-      "duration_ms": 10.45,
+      "duration_ms": 9.68,
       "rows": 6
     },
     "operations/ingestion-runs": {
       "status": 200,
-      "duration_ms": 9.08,
+      "duration_ms": 8.48,
       "rows": 0
     },
     "operations/quality": {
       "status": 200,
-      "duration_ms": 12.27,
+      "duration_ms": 8.88,
       "rows": 0
     },
     "operations/health": {
       "status": 200,
-      "duration_ms": 9.8,
+      "duration_ms": 9.27,
       "rows": 1
     },
     "operations/completeness": {
       "status": 200,
-      "duration_ms": 11.43,
+      "duration_ms": 11.03,
       "rows": 14
     },
     "metadata/fuels": {
       "status": 200,
-      "duration_ms": 9.5,
+      "duration_ms": 6.76,
       "rows": 11
     },
     "metadata/regions": {
       "status": 200,
-      "duration_ms": 8.92,
+      "duration_ms": 9.89,
       "rows": 18
     },
     "metadata/factors": {
       "status": 200,
-      "duration_ms": 9.58,
+      "duration_ms": 8.31,
       "rows": 14
     },
     "overview": {
       "status": 200,
-      "duration_ms": 17.99,
+      "duration_ms": 20.44,
       "rows": 1
     },
     "carbon/trend": {
       "status": 200,
-      "duration_ms": 12.22,
+      "duration_ms": 11.18,
       "rows": 14
     },
     "generation/trend": {
       "status": 200,
-      "duration_ms": 17.07,
+      "duration_ms": 19.59,
       "rows": 126
     },
     "generation/outturn": {
       "status": 200,
-      "duration_ms": 31.75,
+      "duration_ms": 37.27,
       "rows": 140
     },
     "demand/profile": {
       "status": 200,
-      "duration_ms": 8.11,
+      "duration_ms": 7.68,
       "rows": 14
     },
     "forecasts/comparison": {
       "status": 200,
-      "duration_ms": 11.57,
+      "duration_ms": 8.04,
       "rows": 14
     },
     "regions/trend": {
       "status": 200,
-      "duration_ms": 12.58,
+      "duration_ms": 11.02,
       "rows": 42
     },
     "regions/benchmark": {
       "status": 200,
-      "duration_ms": 7.7,
+      "duration_ms": 8.4,
       "rows": 0
     },
     "carbon/drilldown": {
       "status": 200,
-      "duration_ms": 15.83,
+      "duration_ms": 24.09,
       "rows": 500
     },
     "insights": {
       "status": 200,
-      "duration_ms": 25.35,
+      "duration_ms": 38.19,
       "rows": 3
     }
   },
@@ -185,25 +200,27 @@
     "core.carbon_revision": 108,
     "ops.ingestion_run": 66,
     "ops.quality_result": 360,
-    "raw.api_response": "Requires migration/writer role; checked separately."
+    "raw.api_response": 76,
+    "raw.quarantine": 0,
+    "core.observation_revision": 506
   },
   "performance": {
     "overview": {
       "requests": 20,
-      "p50_ms": 16.57,
-      "p95_ms": 22.96,
+      "p50_ms": 15.15,
+      "p95_ms": 27.95,
       "scope": "local HTTP, warm pool, loaded data"
     },
     "carbon/trend": {
       "requests": 20,
-      "p50_ms": 9.44,
-      "p95_ms": 10.69,
+      "p50_ms": 8.01,
+      "p95_ms": 9.81,
       "scope": "local HTTP, warm pool, loaded data"
     },
     "regions/ranking": {
       "requests": 20,
-      "p50_ms": 15.66,
-      "p95_ms": 18.64,
+      "p50_ms": 14.2,
+      "p95_ms": 20.26,
       "scope": "local HTTP, warm pool, loaded data"
     }
   },
@@ -217,7 +234,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 10:00:28.609341+01:00",
-      "age_minutes": "63.5522044833333333",
+      "age_minutes": "79.9998109833333333",
       "stale": false
     },
     {
@@ -229,7 +246,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:18.557721+01:00",
-      "age_minutes": "63.5522044833333333",
+      "age_minutes": "79.9998109833333333",
       "stale": false
     },
     {
@@ -241,7 +258,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:17.788623+01:00",
-      "age_minutes": "63.5522044833333333",
+      "age_minutes": "79.9998109833333333",
       "stale": false
     },
     {
@@ -253,7 +270,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:17.593679+01:00",
-      "age_minutes": "63.5522044833333333",
+      "age_minutes": "79.9998109833333333",
       "stale": false
     },
     {
@@ -265,7 +282,7 @@
       "stale_minutes": 17280,
       "observed_at": "2026-10-14 08:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:22.821810+01:00",
-      "age_minutes": "123.5522044833333333",
+      "age_minutes": "139.9998109833333333",
       "stale": false
     },
     {
@@ -277,7 +294,7 @@
       "stale_minutes": 43200,
       "observed_at": "2026-10-14 09:33:21.932873+01:00",
       "last_success_at": "2026-10-14 09:58:17.690743+01:00",
-      "age_minutes": "30.1866566000000000",
+      "age_minutes": "46.6342631000000000",
       "stale": false
     }
   ],
@@ -293,8 +310,8 @@
         "Total Cost": 309.0,
         "Plan Rows": 1,
         "Plan Width": 32,
-        "Actual Startup Time": 0.164,
-        "Actual Total Time": 0.165,
+        "Actual Startup Time": 0.245,
+        "Actual Total Time": 0.246,
         "Actual Rows": 1.0,
         "Actual Loops": 1,
         "Disabled": false,
@@ -320,8 +337,8 @@
             "Total Cost": 307.4,
             "Plan Rows": 632,
             "Plan Width": 5,
-            "Actual Startup Time": 0.048,
-            "Actual Total Time": 0.103,
+            "Actual Startup Time": 0.067,
+            "Actual Total Time": 0.147,
             "Actual Rows": 623.0,
             "Actual Loops": 1,
             "Disabled": false,
@@ -350,8 +367,8 @@
                 "Total Cost": 24.18,
                 "Plan Rows": 632,
                 "Plan Width": 0,
-                "Actual Startup Time": 0.034,
-                "Actual Total Time": 0.034,
+                "Actual Startup Time": 0.047,
+                "Actual Total Time": 0.048,
                 "Actual Rows": 624.0,
                 "Actual Loops": 1,
                 "Disabled": false,
@@ -384,9 +401,47 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0
       },
-      "Planning Time": 0.263,
+      "Planning Time": 0.239,
       "Triggers": [],
-      "Execution Time": 0.19
+      "Execution Time": 0.277
     }
-  ]
+  ],
+  "runs_by_source": [
+    {
+      "source_id": "carbon",
+      "status": "success",
+      "runs": 16
+    },
+    {
+      "source_id": "demand",
+      "status": "success",
+      "runs": 3
+    },
+    {
+      "source_id": "elexon",
+      "status": "success",
+      "runs": 15
+    },
+    {
+      "source_id": "factors",
+      "status": "success",
+      "runs": 2
+    },
+    {
+      "source_id": "mix",
+      "status": "success",
+      "runs": 15
+    },
+    {
+      "source_id": "regional",
+      "status": "success",
+      "runs": 15
+    }
+  ],
+  "deployment": {
+    "public_url": null,
+    "status": "Blocked: persistent backend/database/worker hosting credentials and budget required",
+    "local_dashboard": "http://127.0.0.1:3001",
+    "local_api": "http://127.0.0.1:8001"
+  }
 }

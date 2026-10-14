@@ -32,7 +32,7 @@ Verified `https://api.neso.energy/api/3/action/datastore_search`, resource `177f
 
 Required fields: `SETTLEMENT_DATE` (ISO date), `SETTLEMENT_PERIOD` (1–50), `ND` (MW), `TSD` (MW), `FORECAST_ACTUAL_INDICATOR` (`A`/`F`). Future `F` rows can contain zero ND/TSD alongside embedded generation forecasts. They retain the F indicator and are excluded from outturn analytics. ND and TSD remain separate definitions; TSD includes additional system requirements. Settlement date uses the British civil day, not UTC date. Period starts are mapped using Europe/London and actual 46/48/50 half-hour day lengths.
 
-The daily resource covers a rolling publication window, not indefinite history. CKAN `package_show?id=historic-demand-data` was also verified and discovers yearly historical resources, including 2026 ID `8a4a771c-3929-4e56-93ad-cdf13219dea5`. Historical resource integration status is recorded separately; do not assume arbitrary-year backfill succeeds from the daily feed.
+The daily resource covers a rolling publication window, not indefinite history. CKAN `package_show?id=historic-demand-data` was also verified and discovers yearly historical resources, including 2026 ID `8a4a771c-3929-4e56-93ad-cdf13219dea5`. The adapter discovers selected yearly resources, extracts bounded dates through verified `datastore_search_sql`, then reconciles with the daily resource. A genuine 2025 one-day backfill inserted 48 rows. Historic resources omit the A/F indicator and are explicitly interpreted as historical outturn.
 
 ## Rate limits and failures
 
@@ -41,3 +41,5 @@ No numerical rate-limit contract was established from the sampled public documen
 ## Geographic boundaries
 
 NESO 2024 DNO GeoJSON resource `1c6a7dc0-1b6c-443a-bc67-5f7125649434` was downloaded from the official portal. Its projected CRS is EPSG:27700; it was transformed to EPSG:4326 and topology-preservingly simplified at 150 metres for display. `docs/boundary-provenance.json` records the source hash, licence, mapping and transformation. DNO areas are approximate licensed regions, not precise serviceability polygons. All 14 GSP-letter mappings are explicit and checked against published area labels.
+
+Elexon revisions are applied in ascending publication order. An older published version cannot overwrite a newer current fact; this is covered by an isolated database test.

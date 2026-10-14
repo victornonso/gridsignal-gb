@@ -188,3 +188,59 @@ def test_failed_ingestion_keeps_raw_and_does_not_advance_watermark(isolated_data
         )
         assert conn.execute(text("SELECT count(*) FROM core.carbon_observation")).scalar() == 0
     writer.dispose()
+
+
+def test_source_lock_skips_overlapping_ingestion(isolated_database, monkeypatch):
+    from pipelines.ingestion import runner
+
+    writer = create_engine(isolated_database["writer"])
+    admin = create_engine(isolated_database["migration"])
+    monkeypatch.setattr(runner, "engine", writer)
+    a = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    with admin.connect() as conn:
+        conn.execute(text("SELECT pg_advisory_lock(hashtext('carbon'))"))
+        conn.commit()
+        try:
+            result = runner.ingest("carbon", a, a + timedelta(days=1))
+            assert result["received"] == 0
+            assert (
+                conn.execute(text("SELECT status FROM ops.ingestion_run ORDER BY id DESC LIMIT 1")).scalar()
+                == "skipped"
+            )
+        finally:
+            conn.execute(text("SELECT pg_advisory_unlock(hashtext('carbon'))"))
+            conn.commit()
+    writer.dispose()
+    admin.dispose()
+
+
+def test_older_elexon_publication_cannot_replace_newer_outturn(connection):
+    a, run, raw = make_lineage(connection)
+    row = dict(
+        period_start=a,
+        period_end=a + timedelta(minutes=30),
+        fuel_id="gas",
+        source_fuel="CCGT",
+        power_mw=200,
+        published_at=a + timedelta(hours=2),
+        source_id="elexon",
+        run_id=run,
+        response_id=raw,
+        record_hash="newer",
+    )
+    assert (
+        upsert(connection, "generation_outturn", row, ["period_start", "source_fuel", "source_id"])
+        == "inserted"
+    )
+    row.update(power_mw=100, published_at=a + timedelta(hours=1), record_hash="older")
+    assert (
+        upsert(connection, "generation_outturn", row, ["period_start", "source_fuel", "source_id"])
+        == "duplicates"
+    )
+    assert (
+        connection.execute(
+            text("SELECT power_mw FROM core.generation_outturn WHERE period_start=:a AND source_fuel='CCGT'"),
+            {"a": a},
+        ).scalar()
+        == 200
+    )
