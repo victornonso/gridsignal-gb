@@ -3,7 +3,13 @@ export type Row = Record<string, string | number | boolean | null>;
 export type Result = {
   rows: Row[];
   meta: {
-    sources?: { id: string; stale: boolean; observed_at: string | null }[];
+    sources?: {
+      id: string;
+      stale: boolean;
+      observed_at: string | null;
+      collection_status?: "current" | "awaiting_update" | "collecting" | "failed" | "overdue" | "source_delayed" | "no_data";
+      next_scheduled_at?: string | null;
+    }[];
     count?: number;
     limit?: number;
     offset?: number;

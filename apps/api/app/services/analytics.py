@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import text
 
 from apps.api.app.db.session import read_engine
+from apps.api.app.services.source_status import source_statuses
 
 CARBON = """WITH base AS (
  SELECT c.*,CASE WHEN region_id=0 THEN actual ELSE forecast END AS value,
@@ -237,19 +238,24 @@ def insights(conn, f):
                         else "Usable observation coverage is below the reporting threshold.",
                     )
                 )
-    for s in rows_for(conn, "operations/sources", f):
-        if s["stale"]:
+    for s in source_statuses(conn):
+        if s["collection_status"] in {"failed", "overdue", "source_delayed", "no_data"}:
             result.append(
                 dict(
-                    metric="source_freshness",
-                    observed=s["age_minutes"],
-                    comparison=s["stale_minutes"],
-                    threshold=s["stale_minutes"],
+                    metric="source_freshness" if s["collection_status"] == "source_delayed" else "collection_status",
+                    observed=s["age_minutes"] if s["collection_status"] == "source_delayed" else s["collection_status"],
+                    comparison=s["stale_minutes"] if s["collection_status"] == "source_delayed" else "successful collection",
+                    threshold=s["stale_minutes"] if s["collection_status"] == "source_delayed" else None,
                     start=f.start,
                     end=f.end,
                     region=0,
                     source=s["name"],
-                    message="Latest source observation exceeds its freshness threshold.",
+                    message={
+                        "failed": "The latest collection attempt failed or returned incomplete data.",
+                        "overdue": "Collection is overdue beyond its scheduled grace period.",
+                        "source_delayed": "Collection succeeded, but the latest available source observation is delayed.",
+                        "no_data": "No successful collection with usable observations is available.",
+                    }[s["collection_status"]],
                 )
             )
     advanced = """WITH recent AS (
@@ -281,14 +287,13 @@ def query(route, filters):
     with read_engine.connect() as conn:
         if route == "overview":
             rows = overview(conn, filters)
+        elif route == "operations/sources":
+            rows = source_statuses(conn)
         elif route == "insights":
             rows = insights(conn, filters)
         else:
             rows = rows_for(conn, route, filters)
-        sources = [
-            dict(r)
-            for r in conn.execute(text("SELECT id,observed_at,stale FROM mart.v_source_freshness")).mappings()
-        ]
+        sources = rows if route == "operations/sources" else source_statuses(conn)
     return dict(
         rows=rows,
         meta=dict(

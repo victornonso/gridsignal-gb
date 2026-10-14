@@ -8,6 +8,31 @@ const screens = [
   ["operations", "Trust starts at the source."],
   ["methodology", "Know what you’re measuring."],
 ];
+for (const state of ["awaiting_update", "failed"] as const) {
+  test(`collection notice distinguishes ${state}`, async ({ page }) => {
+    await page.route("**/api/v1/overview?*", async (route) => {
+      const response = await route.fetch();
+      const body = await response.json();
+      body.meta.sources = body.meta.sources.map((source: Record<string, unknown>, index: number) => ({
+        ...source,
+        stale: true,
+        collection_status: index === 0 ? state : "awaiting_update",
+        next_scheduled_at: "2026-10-14T18:23:00Z",
+      }));
+      await route.fulfill({ response, json: body });
+    });
+    await page.goto("/?screen=overview&start=2026-10-07&end=2026-10-13");
+    if (state === "awaiting_update") {
+      await expect(page.locator(".top-status")).toContainText("Awaiting scheduled update");
+      await expect(page.locator(".notice.info")).toContainText("UK time");
+      await expect(page.getByText("outside freshness thresholds", { exact: false })).toHaveCount(0);
+    } else {
+      await expect(page.locator(".top-status")).toContainText("Collection needs attention");
+      await expect(page.locator(".notice")).toContainText("1 failed or incomplete");
+      await expect(page.locator(".notice.info")).toHaveCount(0);
+    }
+  });
+}
 for (const [screen, title] of screens) {
   test(`${screen}: real analytics and responsive layout`, async ({
     page,

@@ -392,6 +392,17 @@ h1 {
   white-space: nowrap;
   color: #7c6740;
 }
+.notice.info {
+  background: #edf3ee;
+  color: #365b48;
+  border-color: #d7e3d9;
+}
+.notice.info .notice-icon {
+  border-color: #6d8e79;
+}
+.notice.info .text-button {
+  color: #365b48;
+}
 .metrics {
   display: grid;
   grid-auto-flow: column;

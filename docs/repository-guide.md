@@ -75,6 +75,8 @@ Paths below are relative to the repository root. Lock files, configuration, evid
 | `apps/api/app/main.py` | Creates FastAPI, CORS, request logging/rate controls, liveness/readiness routes, registered analytics routes, region/run details, metric definitions and streamed CSV exports. Database failures become a controlled 503 response. |
 | `apps/api/app/schemas/analytics.py` | Defines Filters, AnalyticsResult and Health models. Validates offset-aware dates, range bounds, region IDs, granularity, pagination and sort options before queries run. |
 | `apps/api/app/services/analytics.py` | Holds the SQL query registry and dynamic query builders. Computes overview metrics and rule-based insights, executes parameterised statements and returns rows with source freshness and filter metadata. |
+| `apps/api/app/services/source_status.py` | Separates observation age from scheduled collection health, applying the UTC collection schedule, queue grace and latest-run status without hiding raw freshness flags. |
+| `apps/api/tests/test_source_status.py` | Tests pending updates, grace boundaries, overdue/stalled jobs, failures, upstream delays, recovery, missing data and UTC schedule rollover. |
 | `apps/api/tests/test_api.py` | Tests the API contract, health responses and invalid filter handling, including query bounds and validation failures. |
 
 ### Next.js frontend configuration and assets

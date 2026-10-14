@@ -188,7 +188,17 @@ function Workspace() {
     queryFn: ({ signal }) => getData("overview", p, signal),
   });
   const values = overview.data?.rows[0] || {};
-  const stale = overview.data?.meta.sources?.filter((s) => s.stale) || [];
+  const sources = overview.data?.meta.sources || [];
+  const attention = sources.filter((s) =>
+    ["failed", "overdue", "source_delayed", "no_data"].includes(s.collection_status || ""),
+  );
+  const awaiting = sources.filter((s) => s.collection_status === "awaiting_update");
+  const collecting = sources.some((s) => s.collection_status === "collecting");
+  const failed = attention.filter((s) => s.collection_status === "failed").length;
+  const overdue = attention.filter((s) => s.collection_status === "overdue").length;
+  const upstreamDelayed = attention.filter((s) => s.collection_status === "source_delayed").length;
+  const noData = attention.filter((s) => s.collection_status === "no_data").length;
+  const nextUpdate = sources.map((s) => s.next_scheduled_at).filter((s): s is string => Boolean(s)).sort()[0];
   const forecast = useQuery({
     queryKey: ["forecasts/errors", p],
     queryFn: ({ signal }) => getData("forecasts/errors", p, signal),
@@ -370,12 +380,18 @@ function Workspace() {
             </span>
           </div>
           <div className="top-status">
-            <span className={`live-dot ${stale.length ? "warning" : ""}`} />
+            <span className={`live-dot ${attention.length ? "warning" : ""}`} />
             {overview.isError
               ? "Connection unavailable"
-              : stale.length
-                ? "Coverage needs attention"
-                : "Sources connected"}
+              : !sources.length || sources.some((s) => !s.collection_status)
+                ? "Checking collection status"
+                : attention.length
+                  ? "Collection needs attention"
+                  : collecting
+                    ? "Collection in progress"
+                    : awaiting.length
+                      ? "Awaiting scheduled update"
+                      : "Sources connected"}
             <span className="gb-pill">GB</span>
           </div>
         </header>
@@ -512,13 +528,21 @@ function Workspace() {
               </button>
             </div>
           )}
-          {stale.length > 0 && (
-            <div className="notice">
-              <span className="notice-icon">!</span>
+          {(attention.length > 0 || awaiting.length > 0 || collecting) && (
+            <div className={`notice ${attention.length ? "" : "info"}`} role="status">
+              <span className="notice-icon" aria-hidden="true">{attention.length ? "!" : "↻"}</span>
               <span>
-                {stale.length} source{stale.length > 1 ? "s" : ""} outside
-                freshness thresholds. Charts show persisted observations, with
-                gaps preserved.
+                {attention.length ? (
+                  <>
+                    Collection needs attention: {[failed ? `${failed} failed or incomplete` : "",
+                      overdue ? `${overdue} overdue` : "",
+                      upstreamDelayed ? `${upstreamDelayed} with delayed source observations` : "",
+                      noData ? `${noData} without usable data` : ""].filter(Boolean).join("; ")}.
+                  </>
+                ) : collecting ? "Collection is in progress." : (
+                  <>Awaiting scheduled update{nextUpdate ? ` · ${stamp(nextUpdate)} UK time` : ""}.</>
+                )}{" "}
+                Charts show the latest stored observations; missing intervals remain visible.
               </span>
               <button className="text-button" onClick={() => nav("operations")}>
                 Inspect sources →

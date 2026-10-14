@@ -13,6 +13,8 @@ The hosted deployment uses Vercel for Next.js, Render Free for FastAPI, Neon Fre
 
 ## Refresh and limits
 
+The API uses `COLLECTION_INTERVAL_HOURS=6`, `COLLECTION_SCHEDULE_MINUTE=23` and `COLLECTION_GRACE_MINUTES=60` to match the UTC Actions schedule and allow queue delays. Observation freshness remains a separate measurement: normal age between scheduled runs shows a neutral pending-update notice. A latest failed/partial run, collection overdue past grace, a running attempt older than 15 minutes, or old upstream observations despite a successful collection remain visible warnings. Local deployments default to per-source cadence with `COLLECTION_INTERVAL_HOURS=0`. These settings classify health; they do not alter the actual workflow schedule.
+
 The hosted workflow runs every six hours, with a ten-minute job timeout and concurrency protection. It resumes from existing source watermarks and retains half-hourly observations: collection frequency is separate from observation resolution. This is a deliberate reduction from the local worker's 30-minute collection cadence. Source freshness indicators remain visible and must not be suppressed to suggest live collection.
 
 At most four scheduled jobs per day means up to 1,240 job minutes in a 31-day month at the timeout, plus manual runs, CI and other repository usage. Private repositories share the account's included minutes; verify the remaining allowance rather than assuming this project owns it. Scheduled workflows can be delayed. Disable the workflow if allowances are insufficient. Do not automatically make the repository public or purchase additional minutes.
