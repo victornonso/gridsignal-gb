@@ -703,7 +703,7 @@ tr:hover td {
   margin-bottom: 24px;
 }
 .method-hero .eyebrow {
-  color: #596a60;
+  color: #c5d7bf;
 }
 .method-hero h2 {
   font-size: 30px;
@@ -715,7 +715,7 @@ tr:hover td {
   max-width: 700px;
   font-size: 12px;
   line-height: 1.8;
-  color: #596a60;
+  color: #c5d7bf;
 }
 .method-stages {
   display: flex;
@@ -729,7 +729,7 @@ tr:hover td {
 }
 .method-stages span {
   font-family: monospace;
-  color: #596a60;
+  color: #c5d7bf;
 }
 .method-text {
   padding: 32px 0;
