@@ -5,6 +5,7 @@ import {
   londonMidnight,
   nextDate,
   number,
+  getData,
 } from "../src/lib/api.ts";
 
 test("British reporting date is independent of device/server timezone", () => {
@@ -21,4 +22,21 @@ test("British date filters span 23 and 25 hours on DST transition days", () => {
 test("Missing values are distinct from genuine zero observations", () => {
   assert.equal(number(null), "—");
   assert.equal(number(0), "0");
+});
+
+test("Hosted startup pages produce a useful retry message", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => new Response("<html>Starting</html>", {
+    headers: { "content-type": "text/html" },
+  }));
+  await assert.rejects(getData("overview", ""), /service is starting/);
+});
+
+test("Analytics requests preserve cancellation while allowing valid JSON", async (t) => {
+  const controller = new AbortController();
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    controller.abort();
+    assert.equal(options.signal.aborted, true);
+    return Response.json({ rows: [], meta: {} });
+  });
+  assert.deepEqual(await getData("overview", "", controller.signal), { rows: [], meta: {} });
 });

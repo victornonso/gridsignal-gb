@@ -34,9 +34,31 @@ def table(conn, name, schema="core"):
 
 
 def upsert(conn, name, record, keys):
+    counts = upsert_batch(conn, name, [record], keys)
+    return next(key for key, count in counts.items() if count)
+
+
+def upsert_batch(conn, name, records, keys):
+    """Bound network round trips; repeated keys are applied in their original order."""
+    counts = dict(inserted=0, updated=0, duplicates=0)
+    pending = []
+    seen = set()
+    for record in records:
+        key = tuple(record[column] for column in keys)
+        if pending and (len(pending) >= 500 or key in seen):
+            _write_batch(conn, name, pending, keys, counts)
+            pending, seen = [], set()
+        pending.append(record)
+        seen.add(key)
+    if pending:
+        _write_batch(conn, name, pending, keys, counts)
+    return counts
+
+
+def _write_batch(conn, name, records, keys, counts):
     obj = table(conn, name)
-    statement = insert(obj).values(**record)
-    updates = {k: getattr(statement.excluded, k) for k in record if k not in keys}
+    statement = insert(obj).values(records)
+    updates = {k: getattr(statement.excluded, k) for k in records[0] if k not in keys}
     updates["updated_at"] = text("now()")
     condition = obj.c.record_hash != statement.excluded.record_hash
     if name == "generation_outturn":
@@ -44,12 +66,14 @@ def upsert(conn, name, record, keys):
             condition,
             or_(obj.c.published_at.is_(None), statement.excluded.published_at >= obj.c.published_at),
         )
-    result = conn.execute(
+    results = conn.execute(
         statement.on_conflict_do_update(index_elements=keys, set_=updates, where=condition).returning(
             text("(xmax=0) AS inserted")
         )
-    ).first()
-    return "duplicates" if result is None else ("inserted" if result.inserted else "updated")
+    ).all()
+    counts["inserted"] += sum(bool(row.inserted) for row in results)
+    counts["updated"] += sum(not row.inserted for row in results)
+    counts["duplicates"] += len(records) - len(results)
 
 
 def normalise(source, body, start, end):
@@ -265,16 +289,18 @@ def ingest(source, start, end):
                             )
                         stats["rejected"] += len(drift)
                         continue
-                    for name, record, keys in normalise(source, body, start, end):
+                    normalised = list(normalise(source, body, start, end))
+                    regions = {record["id"]: record for name, record, _ in normalised if name == "region"}
+                    if regions:
+                        obj = table(conn, "region")
+                        stmt = insert(obj).values(list(regions.values()))
+                        conn.execute(stmt.on_conflict_do_update(
+                            index_elements=["id"],
+                            set_={k: getattr(stmt.excluded, k) for k in next(iter(regions.values())) if k != "id"},
+                        ))
+                    batches = {}
+                    for name, record, keys in normalised:
                         if name == "region":
-                            obj = table(conn, "region")
-                            stmt = insert(obj).values(**record)
-                            conn.execute(
-                                stmt.on_conflict_do_update(
-                                    index_elements=["id"],
-                                    set_={k: getattr(stmt.excluded, k) for k in record if k != "id"},
-                                )
-                            )
                             continue
                         if name == "quarantine":
                             conn.execute(
@@ -308,7 +334,10 @@ def ingest(source, start, end):
                         record["record_hash"] = hash_record(
                             {k: v for k, v in record.items() if k not in {"run_id", "response_id"}}
                         )
-                        stats[upsert(conn, name, record, keys)] += 1
+                        batches.setdefault((name, tuple(keys)), []).append(record)
+                    for (name, keys), records in batches.items():
+                        for outcome, count in upsert_batch(conn, name, records, keys).items():
+                            stats[outcome] += count
                 status = "partial" if stats["rejected"] or not stats["received"] else "success"
                 conn.execute(
                     text(

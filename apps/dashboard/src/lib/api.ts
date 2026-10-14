@@ -15,7 +15,8 @@ export async function getData(
   params: string,
   signal?: AbortSignal,
 ): Promise<Result> {
-  const timeout = AbortSignal.timeout(20000);
+  // Free hosted APIs may take around a minute to resume after inactivity.
+  const timeout = AbortSignal.timeout(90000);
   const response = await fetch(`${API}/${route}?${params}`, {
     signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
   });
@@ -24,6 +25,9 @@ export async function getData(
     throw new Error(
       body.detail || `Analytics unavailable (${response.status})`,
     );
+  }
+  if (!response.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("The analytics service is starting. Please retry in a moment.");
   }
   return response.json();
 }

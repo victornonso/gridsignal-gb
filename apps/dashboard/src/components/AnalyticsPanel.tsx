@@ -1,12 +1,30 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { getData, number, Row } from "@/lib/api";
 import { chartOption } from "@/lib/charts";
 const Chart = dynamic(() => import("./Chart"), {
   ssr: false,
   loading: () => <div className="skeleton chart" />,
 });
+function LoadingChart() {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(timer);
+  }, []);
+  return (
+    <div role="status" aria-live="polite">
+      <div className="skeleton chart" aria-hidden="true" />
+      {slow && (
+        <p className="empty">
+          Connecting to the analytics service. After inactivity, this can take about a minute.
+        </p>
+      )}
+    </div>
+  );
+}
 export function DataTable({
   rows,
   onRow,
@@ -105,7 +123,7 @@ export function AnalyticsPanel({
         <span className="panel-dot" aria-hidden="true" />
       </header>
       {q.isPending ? (
-        <div className="skeleton chart" />
+        <LoadingChart />
       ) : q.isError ? (
         <div className="error" role="alert">
           {q.error.message}

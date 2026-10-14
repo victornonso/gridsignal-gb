@@ -8,7 +8,7 @@ The hosted deployment uses Vercel for Next.js, Render Free for FastAPI, Neon Fre
 2. Create a Neon PostgreSQL 18 project in a region near Render Frankfurt, with database `gridsignal_db`. Enable scale to zero. Provision separate reader and writer login roles and run Alembic with the database owner credential. Preserve the existing least-privilege grants. Use direct TLS connection strings with the `postgresql+psycopg://` scheme; the API sends PostgreSQL connection options that must be checked before choosing any transaction pooler.
 3. Backfill a modest reporting window and measure database size before enabling scheduled ingestion. A full copy of local raw history is not required.
 4. Deploy the root `render.yaml`. Set only `READ_DATABASE_URL` and the exact Vercel origin in `CORS_ORIGINS`; do not give the public API migration or writer credentials. There is no paid worker or Render database in this Blueprint. Readiness must pass before releasing the dashboard.
-5. Configure Vercel's API target and verify cold-start handling: Render can take about a minute to wake, which exceeds the current dashboard's 20-second request timeout. Adjust the request/retry and visible loading experience before deployment. Do not claim the existing timeout is adequate.
+5. Configure Vercel's `NEXT_PUBLIC_API_URL` directly to the HTTPS Render API `/api/v1` endpoint and verify CORS/cold-start handling. Requests allow 90 seconds, with a delayed connecting message in chart panels and the existing bounded query retry. A direct API URL avoids a frontend proxy cutting off a cold start early. Verify the real hosted behaviour before release.
 6. Store the Neon writer URL in the repository's `HOSTED_WRITER_DATABASE_URL` Actions secret. Check remaining account-wide Actions minutes, caches/artifacts and billing settings first. Set `HOSTED_INGESTION_ENABLED=true` only after an authenticated manual workflow succeeds.
 
 ## Refresh and limits
@@ -23,7 +23,7 @@ Render Free sleeps after 15 idle minutes and shares 750 monthly instance hours w
 
 ## Status
 
-Configuration is prepared; hosted provisioning, credentials, quota checks, role verification, cold-start UI adjustments and public deployment are still pending. Local/Compose verification does not establish hosted compatibility.
+Configuration is prepared; hosted provisioning, credentials, quota checks, role verification, hosted cold-start verification and public deployment are still pending. Local/Compose verification does not establish hosted compatibility.
 
 ## Official references (reviewed 14 October 2026)
 

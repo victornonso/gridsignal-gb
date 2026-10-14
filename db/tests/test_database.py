@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import DBAPIError
 
 from apps.api.app.services.analytics import QUERIES
-from pipelines.ingestion.runner import upsert
+from pipelines.ingestion.runner import upsert, upsert_batch
 from pipelines.transformations.calendar import calendar_rows
 
 pytestmark = pytest.mark.skipif(
@@ -64,6 +64,21 @@ def test_idempotent_upsert_and_revision_tracking(connection):
         {"r": run},
     ).one()
     assert row == ("100", "105")
+
+
+def test_batch_preserves_repeated_key_revisions_and_duplicate_counts(connection):
+    a, run, raw = make_lineage(connection)
+    base = dict(region_id=0, period_start=a, period_end=a + timedelta(minutes=30),
+                actual=100, forecast=110, source_id="carbon", run_id=run,
+                response_id=raw, record_hash="first")
+    records = [dict(base), dict(base, actual=105, record_hash="second"),
+               dict(base, actual=105, record_hash="second"),
+               dict(base, period_start=a + timedelta(minutes=30), period_end=a + timedelta(hours=1))]
+    assert upsert_batch(connection, "carbon_observation", records, ["region_id", "period_start"]) == {
+        "inserted": 2, "updated": 1, "duplicates": 1,
+    }
+    assert connection.execute(text("SELECT count(*) FROM core.carbon_revision WHERE run_id=:r"),
+                              {"r": run}).scalar_one() == 1
 
 
 def test_forecast_metrics_exclude_null_pairs(connection):
