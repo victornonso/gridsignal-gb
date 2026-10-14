@@ -34,11 +34,7 @@ def main():
         assert response.headers.get("access-control-allow-origin") == "https://gridsignal-gb.vercel.app"
         report["cors"] = "verified"
     with psycopg.connect(config["database_url"].replace("postgresql+psycopg://", "postgresql://", 1)) as conn:
-        # The interrupted pre-batch seed is retained as a failed run; the same window was reprocessed.
-        conn.execute("""UPDATE ops.ingestion_run SET status='failed',finished_at=now(),
-                     error='Ingestion interrupted; window reprocessed successfully'
-                     WHERE id=8 AND source_id='regional' AND status='running'
-                     AND pg_try_advisory_xact_lock(hashtext(source_id))""")
+        conn.execute("SET TRANSACTION READ ONLY")
         for name in ["core.carbon_observation", "core.generation_share", "core.generation_outturn",
                      "core.demand_observation", "raw.api_response", "raw.quarantine"]:
             report["counts"][name] = conn.execute(sql.SQL("SELECT count(*) FROM {}").format(
