@@ -2,6 +2,8 @@
 
 GridSignal requires persistent PostgreSQL 18, an API process, and an unattended ingestion worker. Vercel can host the Next.js frontend; it does not replace the persistent worker or database.
 
+For the selected **free-only hosted deployment**, see [free-tier.md](free-tier.md): Render API, Neon PostgreSQL, Vercel frontend and GitHub Actions ingestion. The continuous worker described below remains the local/paid-hosting topology.
+
 ## Railway deployment topology
 
 1. PostgreSQL service: official `postgres:18` image; persistent volume at `/var/lib/postgresql`; `POSTGRES_DB=gridsignal_db`. Use generated secret passwords. Disable public database exposure after migrations when private networking is available.

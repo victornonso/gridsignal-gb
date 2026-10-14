@@ -1,0 +1,26 @@
+name: Hosted data refresh
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: hosted-data-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    # Enable only after account-wide Actions allowance and hosted database are verified.
+    if: vars.HOSTED_INGESTION_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.HOSTED_WRITER_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install uv && uv sync --frozen --no-dev
+      - name: Refresh official observations
+        run: uv run python -m pipelines.orchestration.hosted_refresh

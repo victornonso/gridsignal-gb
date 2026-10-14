@@ -1,0 +1,16 @@
+# API only. PostgreSQL is provisioned on Neon's Free plan, not Render's expiring trial database.
+services:
+  - type: web
+    name: gridsignal-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: infrastructure/docker/api.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health/ready
+    envVars:
+      - key: READ_DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
