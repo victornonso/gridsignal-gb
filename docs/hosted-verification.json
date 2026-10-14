@@ -1,0 +1,177 @@
+{
+  "verified_at": "2026-10-14T13:53:00.412516+00:00",
+  "endpoints": {
+    "carbon/latest": {
+      "status": 200,
+      "rows": 1
+    },
+    "carbon/distribution": {
+      "status": 200,
+      "rows": 11
+    },
+    "carbon/profile": {
+      "status": 200,
+      "rows": 48
+    },
+    "carbon/heatmap": {
+      "status": 200,
+      "rows": 168
+    },
+    "carbon/comparison": {
+      "status": 200,
+      "rows": 2
+    },
+    "generation/mix": {
+      "status": 200,
+      "rows": 9
+    },
+    "generation/summary": {
+      "status": 200,
+      "rows": 1
+    },
+    "generation/volatility": {
+      "status": 200,
+      "rows": 9
+    },
+    "generation/profile": {
+      "status": 200,
+      "rows": 240
+    },
+    "demand/summary": {
+      "status": 200,
+      "rows": 1
+    },
+    "demand/hourly": {
+      "status": 200,
+      "rows": 48
+    },
+    "demand/comparison": {
+      "status": 200,
+      "rows": 1
+    },
+    "demand/distribution": {
+      "status": 200,
+      "rows": 18
+    },
+    "regions": {
+      "status": 200,
+      "rows": 18
+    },
+    "regions/ranking": {
+      "status": 200,
+      "rows": 14
+    },
+    "forecasts/errors": {
+      "status": 200,
+      "rows": 1
+    },
+    "forecasts/distribution": {
+      "status": 200,
+      "rows": 12
+    },
+    "forecasts/hourly": {
+      "status": 200,
+      "rows": 24
+    },
+    "forecasts/weekday": {
+      "status": 200,
+      "rows": 7
+    },
+    "forecasts/revisions": {
+      "status": 200,
+      "rows": 0
+    },
+    "operations/sources": {
+      "status": 200,
+      "rows": 6
+    },
+    "operations/ingestion-runs": {
+      "status": 200,
+      "rows": 0
+    },
+    "operations/quality": {
+      "status": 200,
+      "rows": 0
+    },
+    "operations/health": {
+      "status": 200,
+      "rows": 1
+    },
+    "operations/completeness": {
+      "status": 200,
+      "rows": 8
+    },
+    "metadata/fuels": {
+      "status": 200,
+      "rows": 11
+    },
+    "metadata/regions": {
+      "status": 200,
+      "rows": 18
+    },
+    "metadata/factors": {
+      "status": 200,
+      "rows": 14
+    },
+    "overview": {
+      "status": 200,
+      "rows": 1
+    },
+    "carbon/trend": {
+      "status": 200,
+      "rows": 8
+    },
+    "generation/trend": {
+      "status": 200,
+      "rows": 72
+    },
+    "generation/outturn": {
+      "status": 200,
+      "rows": 80
+    },
+    "demand/profile": {
+      "status": 200,
+      "rows": 8
+    },
+    "forecasts/comparison": {
+      "status": 200,
+      "rows": 8
+    },
+    "regions/trend": {
+      "status": 200,
+      "rows": 24
+    },
+    "regions/benchmark": {
+      "status": 200,
+      "rows": 0
+    },
+    "carbon/drilldown": {
+      "status": 200,
+      "rows": 336
+    },
+    "insights": {
+      "status": 200,
+      "rows": 8
+    }
+  },
+  "counts": {
+    "core.carbon_observation": 6066,
+    "core.generation_share": 54594,
+    "core.generation_outturn": 6740,
+    "core.demand_observation": 336,
+    "raw.api_response": 42,
+    "raw.quarantine": 0
+  },
+  "anonymous_dashboard": 200,
+  "api_readiness": 200,
+  "cors": "verified",
+  "database_bytes": 28942336,
+  "successful_sources": [
+    "carbon",
+    "demand",
+    "elexon",
+    "factors",
+    "mix",
+    "regional"
+  ]
+}

@@ -52,7 +52,7 @@ def main():
                     sql.Identifier(role), sql.Literal(password)))
             conn.execute(sql.SQL("GRANT CONNECT ON DATABASE gridsignal_db TO {}").format(sql.Identifier(role)))
         version = conn.execute("SHOW server_version").fetchone()[0]
-        raw_oid = conn.execute("SELECT 'raw.api_response'::regclass::oid").fetchone()[0] if target.exists() else None
+        raw_oid = conn.execute("SELECT to_regclass('raw.api_response')::oid").fetchone()[0]
     config["migration_database_url"] = owner.replace("postgresql://", "postgresql+psycopg://", 1)
     for role, key in [("gridsignal_reader", "read_database_url"), ("gridsignal_writer", "database_url")]:
         auth = f"{role}:{quote(config['passwords'][role], safe='')}@{parts.netloc.split('@', 1)[1]}"

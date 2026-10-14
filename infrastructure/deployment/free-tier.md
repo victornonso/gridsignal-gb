@@ -23,7 +23,15 @@ Render Free sleeps after 15 idle minutes and shares 750 monthly instance hours w
 
 ## Status
 
-Configuration is prepared; hosted provisioning, credentials, quota checks, role verification, hosted cold-start verification and public deployment are still pending. Local/Compose verification does not establish hosted compatibility.
+Deployed on 14 October 2026: https://gridsignal-gb.vercel.app/ with API https://gridsignal-api.onrender.com/api/v1 and Neon PostgreSQL 18.6 in Frankfurt. Reader isolation, HTTPS, anonymous access, exact-origin CORS and all 38 analytical routes passed verification. All six source adapters populated real facts; the initial hosted database measured about 29 MB. See `docs/hosted-verification.json` for measured evidence.
+
+Scheduled ingestion is enabled. Its first GitHub Actions execution (38575628489) completed successfully. The account's existing $0 Actions budget has stop-usage enabled; 67 of the included 2,000 Linux minutes had been consumed when inspected. Render has no payment card on file. No paid service was provisioned. These limits may suspend services rather than guarantee continuous availability.
+
+The temporary Neon CLI OAuth token was revoked and its local credential file removed. Application reader/writer credentials remain in the appropriate service environment and encrypted GitHub repository secret; local provisioning credentials are ignored by Git.
+
+Cold-start request handling and delayed loading text are implemented; a deliberately idle, timed cold-start acceptance test has not yet been recorded. Independent hosted backup automation is not configured; the Neon project reports six hours of history retention. Browser verification used Chromium, not native Safari.
+
+Deployment helper dependencies are available with `uv sync --extra deploy`. Never print `.local/hosted.json` or commit credentials. The GitHub secret helper uses the existing credential manager and encrypts the writer URL with the repository's public key.
 
 ## Official references (reviewed 14 October 2026)
 

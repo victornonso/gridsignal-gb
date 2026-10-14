@@ -2,6 +2,8 @@
 
 **Great Britain electricity intelligence.**
 
+[Live workspace](https://gridsignal-gb.vercel.app/) · [API documentation](https://gridsignal-api.onrender.com/docs) · [Victor Okeke](https://victorokeke.co.uk/)
+
 GridSignal connects official electricity-system observations to a seven-screen analytical workspace: carbon intensity, generation composition, metered outturn, national/transmission demand, regional comparisons, forecast differences and data operations.
 
 The project combines reproducible data engineering with PostgreSQL analytics, a read-only FastAPI service and a bespoke Next.js/ECharts interface. Every displayed production metric comes from persisted official-source observations.
@@ -129,6 +131,6 @@ Analytical routes are under `/api/v1`: overview, carbon, generation, demand, reg
 
 ## Deployment and documentation
 
-The full production topology needs a persistent PostgreSQL host and background worker host. Vercel can host the frontend; backend hosting authentication/billing must be configured before a functional public deployment is claimed. No production URL is invented.
+The public workspace runs on Vercel with a Render Free API and Neon Free PostgreSQL 18. GitHub Actions collects official observations every six hours; half-hourly source resolution is preserved. Render can take about a minute to wake after inactivity. Free quotas apply. The repository retains the continuous Docker worker for local development. See [free-tier operations](infrastructure/deployment/free-tier.md) and [hosted verification](docs/hosted-verification.json).
 
 See [deployment guide](infrastructure/deployment/README.md), [architecture](docs/architecture.md), [data dictionary](docs/data-dictionary.md), [metric catalogue](docs/metric-catalogue.md), [methodology](docs/methodology.md) and [implementation status](docs/implementation-status.md).

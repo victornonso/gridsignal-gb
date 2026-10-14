@@ -49,13 +49,13 @@ Official NESO Carbon Intensity, regional, mix, factor and demand APIs and Elexon
 - GitHub: private repository `https://github.com/victornonso/gridsignal-gb`.
 - Local dashboard: `http://127.0.0.1:3001`.
 - Local API docs: `http://127.0.0.1:8001/docs`.
-- Public deployment: **not deployed**. Authenticated persistent PostgreSQL/API/worker hosting and a budget are still required. Vercel authentication is available for the frontend, but a disconnected frontend is not being published as the complete application.
+- Public deployment: https://gridsignal-gb.vercel.app/ with a Render Free API and Neon PostgreSQL 18.6. Anonymous access, exact-origin CORS and all 38 analytical routes passed. `hosted-verification.json` records database counts and source evidence separately from the local baseline.
 - Local Docker Desktop cannot initialise its inference socket. Native PostgreSQL 18 is verified locally; both Docker image builds and a PostgreSQL container were verified independently in CI.
 - A saved browser permission blocked subsequent interactive preview opening. The recorded 30-check production browser run had already completed successfully before that block. No browser workaround was used.
 
 ## Remaining operational acceptance
 
-Provision authenticated persistent hosting, migrate and backfill its database, configure exact production origins/secrets, run the worker, deploy the frontend against that API, verify HTTPS and production freshness, configure hosted backup storage/retention and repeat the deployment smoke checks. Native Safari/WebKit was not tested; tablet/mobile checks used Chromium device emulation. Full historical issue-time forecast skill is unsupported because the source does not provide those retained vintages.
+Independent hosted backup automation and a deliberately idle, timed cold-start acceptance test remain outstanding. Neon reports six hours of history retention. Native Safari/WebKit was not tested; tablet/mobile checks used Chromium device emulation. Full historical issue-time forecast skill is unsupported because the source does not provide those retained vintages. The free deployment uses bounded GitHub Actions refreshes every six hours instead of a paid continuous worker.
 
 ## Additional container verification
 
@@ -71,4 +71,6 @@ Two orchestration unit tests verify bounded watermark-based recovery after a lon
 
 ## Final CI result
 
-GitHub Actions run **38545434778**, source commit **565b81a**, passed all four jobs: Python/database, frontend (including its three unit tests), end-to-end browser verification, and complete Docker Compose integration. CI provisioned fresh PostgreSQL 18, applied migrations, ingested official data and verified the running system. No public deployment URL is claimed.
+GitHub Actions run **38575064669**, source commit **d2d9170**, passed all four jobs: Python/database, frontend, end-to-end browser verification, and complete Docker Compose integration. The suite now contains 35 Python/database/API tests and five frontend unit tests; 30 browser checks passed in CI. The actual hosted refresh workflow **38575628489** also completed successfully. All seven deployed screens and mobile navigation were inspected through the HTTPS dashboard, with no horizontal page overflow at 390 px. Screenshots are in `screenshots/hosted-overview.png` and `screenshots/hosted-mobile.png`.
+
+The temporary Neon CLI OAuth token was revoked after provisioning. Render is using a Free instance with no payment card on file. GitHub's existing $0 Actions budget has stop-usage enabled. Hosted database storage measured approximately 29 MB at initial verification; scheduled ingestion must remain within the documented free-tier limits.

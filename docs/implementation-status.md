@@ -48,8 +48,9 @@ Last reviewed: 14 October 2026. Status vocabulary: Not started / In progress / I
 | CI lint, test, build, Docker validation | Tested | First full GitHub Actions run 38540112974 passed all three jobs including real backfill, API, 30 browser checks and Docker builds; final run 38545434778 passed all four jobs |
 | Performance evidence | Tested locally | Real 20-request API samples and EXPLAIN output in verification JSON; not a cloud SLA |
 | Documentation and metric catalogue | Implemented | Architecture, contracts, methodology, database-generated dictionary/catalogue, ADR, deployment, README and case study |
-| Production deployment | Blocked | Vercel account available; persistent backend/database/worker host authentication and billing choice needed |
-| HTTPS, hosted backups and production monitoring | Blocked | Depend on deployment destination; local backup profile implemented |
+| Hosted free-tier deployment | Tested | Vercel dashboard, Render Free API, Neon PostgreSQL 18.6, six-hour GitHub Actions refresh; all 38 analytical routes and anonymous access verified |
+| HTTPS and hosted operational visibility | Tested | HTTPS on both services, CORS verified, real source/run/quality records visible |
+| Independent hosted backups | Not started | Local backup profile exists; independent hosted backup automation is not configured. Neon project reports six hours of history retention. |
 | Portfolio case study | Implemented | `docs/case-study.md` with genuine screenshots/findings and explicit deployment status |
 
 ## Local runtime
@@ -64,6 +65,6 @@ Local verification and final source CI are complete. Deploy the full topology wh
 
 34 local Python/API/database tests passed. The final 30-check production-browser suite also passed (59.4 seconds). The first complete responsive suite passed 30 browser checks, and the first hosted CI run passed all jobs. Database tests now create and remove a separate temporary PostgreSQL database, so even failed-ingestion tests cannot contaminate production operational counters. A real repeated historical carbon window returned 49 duplicates with zero inserts or updates. CSV export now streams all filtered rows from a repeatable-read snapshot. The latest source refinements require the final verification run recorded in `verification-report.md`.
 
-Interactive browser opening is now blocked by a saved browser permission; the final automated run had completed before this rejection. Further browser work requires restoring permission. The final evidence snapshot is in `verification-report.md`.
+Local browser opening remains blocked by a saved permission. The separately deployed HTTPS application was inspected on desktop and mobile, including all seven screens and mobile navigation; no local permission workaround was used.
 
-Final code CI **38545434778** passed all four jobs at source commit **565b81a**. The local suite contains **34 Python/API/database tests**, **3 frontend unit tests**, and the recorded **30 browser checks**. Deployment and hosted operations remain blocked only by hosting access/budget.
+Code CI **38575064669** passed all four jobs at source commit **d2d9170**, including the 30 browser checks. The local suite now contains **35 Python/API/database tests** and **5 frontend unit tests**. Hosted ingestion run **38575628489** succeeded against the actual Neon database. GitHub Free usage was 67 minutes when inspected, with an existing $0 Actions budget and stop-usage enabled. Render has no payment card on file. The temporary Neon CLI OAuth token was revoked after provisioning.

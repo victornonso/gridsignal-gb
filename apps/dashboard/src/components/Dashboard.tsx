@@ -90,7 +90,7 @@ export function Dashboard() {
             staleTime: 60000,
             retry: 1,
             refetchOnWindowFocus: false,
-            refetchInterval: 60000,
+            refetchInterval: process.env.NEXT_PUBLIC_DATA_REFRESH_HOURS ? 900000 : 60000,
           },
         },
       }),
@@ -956,10 +956,9 @@ function Workspace() {
                 </p>
                 <h3>Source schedules</h3>
                 <p>
-                  Carbon, regional and generation adapters poll every 30
-                  minutes. Demand and published factors refresh daily;
-                  reconciliation runs every six hours. Polling frequency does
-                  not change source publication frequency.
+                  {process.env.NEXT_PUBLIC_DATA_REFRESH_HOURS
+                    ? `This workspace collects official source observations every ${process.env.NEXT_PUBLIC_DATA_REFRESH_HOURS} hours. Half-hourly records retain their original observation times. Scheduled collection can be delayed; Data Operations shows the latest successful runs and source freshness.`
+                    : "Carbon, regional and generation adapters poll every 30 minutes. Demand and published factors refresh daily; reconciliation runs every six hours. Polling frequency does not change source publication frequency."}
                 </p>
                 <h3>Source documentation</h3>
                 <a

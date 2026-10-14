@@ -11,6 +11,7 @@ dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1", "sqlalchemy>=
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+deploy = ["pynacl>=1.6,<2"]
 
 [project.scripts]
 gridsignal = "pipelines.cli:main"
