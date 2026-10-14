@@ -2,6 +2,8 @@
 
 **Great Britain electricity intelligence.**
 
+Built and maintained by [Victor Okeke](https://victorokeke.co.uk/).
+
 [Live workspace](https://gridsignal-gb.vercel.app/) · [API documentation](https://gridsignal-api.onrender.com/docs) · [Victor Okeke](https://victorokeke.co.uk/)
 
 GridSignal connects official electricity-system observations to a seven-screen analytical workspace: carbon intensity, generation composition, metered outturn, national/transmission demand, regional comparisons, forecast differences and data operations.
@@ -43,7 +45,7 @@ Contracts and genuine samples are in [source-contracts.md](docs/source-contracts
 
 ## Local setup — Windows / Docker Desktop
 
-Requirements: Docker Desktop with Linux containers, Python 3.12+, uv, Node.js 22+, Git. The agent-created checkout is already initialised; cloning is only necessary on another machine.
+Requirements: Docker Desktop with Linux containers, Python 3.12+, uv, Node.js 22+, Git. Clone the repository when setting up a new development environment.
 
 ```powershell
 git clone https://github.com/victornonso/gridsignal-gb.git
@@ -133,4 +135,4 @@ Analytical routes are under `/api/v1`: overview, carbon, generation, demand, reg
 
 The public workspace runs on Vercel with a Render Free API and Neon Free PostgreSQL 18. GitHub Actions collects official observations every six hours; half-hourly source resolution is preserved. Render can take about a minute to wake after inactivity. Free quotas apply. The repository retains the continuous Docker worker for local development. See [free-tier operations](infrastructure/deployment/free-tier.md) and [hosted verification](docs/hosted-verification.json).
 
-See [deployment guide](infrastructure/deployment/README.md), [architecture](docs/architecture.md), [data dictionary](docs/data-dictionary.md), [metric catalogue](docs/metric-catalogue.md), [methodology](docs/methodology.md) and [implementation status](docs/implementation-status.md).
+See the [repository and code guide](docs/repository-guide.md) for a file-by-file walkthrough. Further references: [deployment guide](infrastructure/deployment/README.md), [architecture](docs/architecture.md), [data dictionary](docs/data-dictionary.md), [metric catalogue](docs/metric-catalogue.md), [methodology](docs/methodology.md) and [implementation status](docs/implementation-status.md).
