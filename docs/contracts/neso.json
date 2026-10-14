@@ -1,0 +1,344 @@
+{
+  "help": "https://api.neso.energy/api/3/action/help_show?name=datastore_search",
+  "success": true,
+  "result": {
+    "sort": "SETTLEMENT_DATE desc",
+    "include_total": true,
+    "resource_id": "177f6fa4-ae49-4182-81ea-0c6b35f26ca6",
+    "fields": [
+      {
+        "type": "int",
+        "id": "_id"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The period from 00:00 hours to 24:00 hours on each day.",
+          "title": "Settlement date",
+          "type": "date",
+          "example": "01/01/2021",
+          "unit": ""
+        },
+        "type": "date",
+        "id": "SETTLEMENT_DATE"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The half hourly period at which outurns occurred. Settlement period 1 runs from 00:00-00:30.",
+          "title": "Settlement Period",
+          "type": "integer",
+          "example": "1",
+          "unit": "Number"
+        },
+        "type": "int4",
+        "id": "SETTLEMENT_PERIOD"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "This is the Great Britain generation requirement and is equivalent to the Initial National Demand Outturn (INDO) and National Demand Forecast as published on BM Reports. National Demand is the sum of metered generation, but excludes generation required to meet station load, pump storage pumping and interconnector exports. National Demand is calculated as a sum of generation based on National Grid ESO operational generation metering.",
+          "title": "National Demand",
+          "type": "integer",
+          "example": "23183",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "ND"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "Indicates weather it's a outurn (A) or Forecast (F).",
+          "title": "Forecast or Actual Indicator",
+          "type": "string",
+          "example": "A, F",
+          "unit": "Text"
+        },
+        "type": "text",
+        "id": "FORECAST_ACTUAL_INDICATOR"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "This is the Transmission System generation requirement and is equivalent to the Initial Transmission System Outturn (ITSDO) and Transmission System Demand Forecast on BM Reports. Transmission System Demand is equal to the ND plus the additional generation required to meet station load, pump storage pumping and interconnector exports. Transmission System Demand is calculated using Nationnal Grid ESO operational metering. Note that the Transmission System Demand includes an estimate of station load of 500MW in BST and 600MW in GMT.",
+          "title": "Transmission System Demand",
+          "type": "integer",
+          "example": "25743",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "TSD"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "England and Wales Demand, as ND above but on an England and Wales basis.",
+          "title": "England and Wales Demand",
+          "type": "integer",
+          "example": "21880",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "ENGLAND_WALES_DEMAND"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "This is an estimate of the GB wind generation from wind farms which do not have Transmission System metering installed. These wind farms are embedded in the distribution network and invisible to National Grid ESO. Their effect is to suppress the electricity demand during periods of high wind. The true output of these generators is not known so an estimate is provided based on National Grid ESO\u2019s best model. ",
+          "title": "Estimated Embedded Wind Generation",
+          "type": "integer",
+          "example": "3001",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "EMBEDDED_WIND_GENERATION"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "This is National Grid ESO\u2019s best view of the installed embedded wind capacity in GB. This is based on publicly available information compiled from a variety of sources and is not the definitive view. It is consistent with the generation estimate provided above.  ",
+          "title": "Embedded Wind Capacity",
+          "type": "integer",
+          "example": "6465",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "EMBEDDED_WIND_CAPACITY"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "This is an estimate of the GB solar generation from PV panels. These are embedded in the distribution network and invisible to National Grid ESO. Their effect is to suppress the electricity demand during periods of high radiation. The true output of these generators is not known so an estimate is provided based on National Grid ESO\u2019s best model.",
+          "title": "Estimated Embedded Solar Generation",
+          "type": "integer",
+          "example": "50",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "EMBEDDED_SOLAR_GENERATION"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "As embedded wind capacity above, but for solar generation.",
+          "title": "Embedded Solar Capacity",
+          "type": "integer",
+          "example": "13080",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "EMBEDDED_SOLAR_CAPACITY"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "For units that are not included in the ND generator definition. This can be in the form of generation or demand reduction.",
+          "title": "Non-Balancing Mechanism Short-Term Operating Reserve ",
+          "type": "integer",
+          "example": "0",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "NON_BM_STOR"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The demand due to pumping at hydro pump storage units; the -ve signifies pumping load. ",
+          "title": "Pump Storage Pumping",
+          "type": "integer",
+          "example": "375",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "PUMP_STORAGE_PUMPING"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "",
+          "title": "SCOTTISH_TRANSFER",
+          "type": "integer",
+          "example": "2003",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "SCOTTISH_TRANSFER"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "IFA Interconnector Flow",
+          "type": "integer",
+          "example": "2003",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "IFA_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "IFA2 Interconnector Flow",
+          "type": "integer",
+          "example": "0",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "IFA2_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "Britned Interconnector Flow",
+          "type": "integer",
+          "example": "-707",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "BRITNED_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "Moyle Interconnector Flow",
+          "type": "integer",
+          "example": "82",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "MOYLE_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "East West Interconnector Flow",
+          "type": "integer",
+          "example": "504",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "EAST_WEST_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "Nemo Interconnector Flow",
+          "type": "integer",
+          "example": "-215",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "NEMO_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "North Sea Link Interconnector Flow",
+          "type": "integer",
+          "example": "-75",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "NSL_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "ElecLink Interconnector Flow",
+          "type": "integer",
+          "example": "-32",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "ELECLINK_FLOW"
+      },
+      {
+        "info": {
+          "comment": "",
+          "description": "The flow on the respective interconnector. -ve signifies export power out from GB; +ve signifies import power into GB.",
+          "title": "Viking Interconnector Flow",
+          "type": "integer",
+          "example": "-32",
+          "unit": "MW"
+        },
+        "type": "int4",
+        "id": "VIKING_FLOW"
+      },
+      {
+        "type": "int4",
+        "id": "GREENLINK_FLOW"
+      }
+    ],
+    "records_format": "objects",
+    "records": [
+      {
+        "_id": 2353,
+        "SETTLEMENT_DATE": "2026-10-20",
+        "SETTLEMENT_PERIOD": 1,
+        "ND": 0,
+        "FORECAST_ACTUAL_INDICATOR": "F",
+        "TSD": 0,
+        "ENGLAND_WALES_DEMAND": 0,
+        "EMBEDDED_WIND_GENERATION": 1538,
+        "EMBEDDED_WIND_CAPACITY": 5906,
+        "EMBEDDED_SOLAR_GENERATION": 0,
+        "EMBEDDED_SOLAR_CAPACITY": 23963,
+        "NON_BM_STOR": 0,
+        "PUMP_STORAGE_PUMPING": 0,
+        "SCOTTISH_TRANSFER": 0,
+        "IFA_FLOW": 0,
+        "IFA2_FLOW": 0,
+        "BRITNED_FLOW": 0,
+        "MOYLE_FLOW": 0,
+        "EAST_WEST_FLOW": 0,
+        "NEMO_FLOW": 0,
+        "NSL_FLOW": 0,
+        "ELECLINK_FLOW": 0,
+        "VIKING_FLOW": 0,
+        "GREENLINK_FLOW": 0
+      },
+      {
+        "_id": 2354,
+        "SETTLEMENT_DATE": "2026-10-20",
+        "SETTLEMENT_PERIOD": 2,
+        "ND": 0,
+        "FORECAST_ACTUAL_INDICATOR": "F",
+        "TSD": 0,
+        "ENGLAND_WALES_DEMAND": 0,
+        "EMBEDDED_WIND_GENERATION": 1534,
+        "EMBEDDED_WIND_CAPACITY": 5906,
+        "EMBEDDED_SOLAR_GENERATION": 0,
+        "EMBEDDED_SOLAR_CAPACITY": 23963,
+        "NON_BM_STOR": 0,
+        "PUMP_STORAGE_PUMPING": 0,
+        "SCOTTISH_TRANSFER": 0,
+        "IFA_FLOW": 0,
+        "IFA2_FLOW": 0,
+        "BRITNED_FLOW": 0,
+        "MOYLE_FLOW": 0,
+        "EAST_WEST_FLOW": 0,
+        "NEMO_FLOW": 0,
+        "NSL_FLOW": 0,
+        "ELECLINK_FLOW": 0,
+        "VIKING_FLOW": 0,
+        "GREENLINK_FLOW": 0
+      }
+    ],
+    "limit": 2,
+    "_links": {
+      "start": "/api/3/action/datastore_search?sort=SETTLEMENT_DATE+desc&limit=2&resource_id=177f6fa4-ae49-4182-81ea-0c6b35f26ca6",
+      "next": "/api/3/action/datastore_search?sort=SETTLEMENT_DATE+desc&offset=2&limit=2&resource_id=177f6fa4-ae49-4182-81ea-0c6b35f26ca6"
+    },
+    "total": 2400
+  }
+}

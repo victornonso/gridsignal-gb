@@ -1,0 +1,392 @@
+{
+  "verified_at": "2026-10-14T09:03:30.631624+00:00",
+  "endpoints": {
+    "carbon/latest": {
+      "status": 200,
+      "duration_ms": 418.37,
+      "rows": 1
+    },
+    "carbon/distribution": {
+      "status": 200,
+      "duration_ms": 9.11,
+      "rows": 12
+    },
+    "carbon/profile": {
+      "status": 200,
+      "duration_ms": 9.86,
+      "rows": 48
+    },
+    "carbon/heatmap": {
+      "status": 200,
+      "duration_ms": 13.06,
+      "rows": 320
+    },
+    "carbon/comparison": {
+      "status": 200,
+      "duration_ms": 7.52,
+      "rows": 2
+    },
+    "generation/mix": {
+      "status": 200,
+      "duration_ms": 14.35,
+      "rows": 9
+    },
+    "generation/summary": {
+      "status": 200,
+      "duration_ms": 11.99,
+      "rows": 1
+    },
+    "demand/summary": {
+      "status": 200,
+      "duration_ms": 7.49,
+      "rows": 1
+    },
+    "demand/hourly": {
+      "status": 200,
+      "duration_ms": 13.68,
+      "rows": 48
+    },
+    "demand/comparison": {
+      "status": 200,
+      "duration_ms": 8.63,
+      "rows": 2
+    },
+    "regions": {
+      "status": 200,
+      "duration_ms": 8.42,
+      "rows": 18
+    },
+    "regions/ranking": {
+      "status": 200,
+      "duration_ms": 16.65,
+      "rows": 14
+    },
+    "forecasts/errors": {
+      "status": 200,
+      "duration_ms": 9.16,
+      "rows": 1
+    },
+    "forecasts/distribution": {
+      "status": 200,
+      "duration_ms": 8.08,
+      "rows": 15
+    },
+    "forecasts/hourly": {
+      "status": 200,
+      "duration_ms": 12.48,
+      "rows": 24
+    },
+    "forecasts/weekday": {
+      "status": 200,
+      "duration_ms": 8.22,
+      "rows": 7
+    },
+    "forecasts/revisions": {
+      "status": 200,
+      "duration_ms": 12.82,
+      "rows": 108
+    },
+    "operations/sources": {
+      "status": 200,
+      "duration_ms": 10.45,
+      "rows": 6
+    },
+    "operations/ingestion-runs": {
+      "status": 200,
+      "duration_ms": 9.08,
+      "rows": 0
+    },
+    "operations/quality": {
+      "status": 200,
+      "duration_ms": 12.27,
+      "rows": 0
+    },
+    "operations/health": {
+      "status": 200,
+      "duration_ms": 9.8,
+      "rows": 1
+    },
+    "operations/completeness": {
+      "status": 200,
+      "duration_ms": 11.43,
+      "rows": 14
+    },
+    "metadata/fuels": {
+      "status": 200,
+      "duration_ms": 9.5,
+      "rows": 11
+    },
+    "metadata/regions": {
+      "status": 200,
+      "duration_ms": 8.92,
+      "rows": 18
+    },
+    "metadata/factors": {
+      "status": 200,
+      "duration_ms": 9.58,
+      "rows": 14
+    },
+    "overview": {
+      "status": 200,
+      "duration_ms": 17.99,
+      "rows": 1
+    },
+    "carbon/trend": {
+      "status": 200,
+      "duration_ms": 12.22,
+      "rows": 14
+    },
+    "generation/trend": {
+      "status": 200,
+      "duration_ms": 17.07,
+      "rows": 126
+    },
+    "generation/outturn": {
+      "status": 200,
+      "duration_ms": 31.75,
+      "rows": 140
+    },
+    "demand/profile": {
+      "status": 200,
+      "duration_ms": 8.11,
+      "rows": 14
+    },
+    "forecasts/comparison": {
+      "status": 200,
+      "duration_ms": 11.57,
+      "rows": 14
+    },
+    "regions/trend": {
+      "status": 200,
+      "duration_ms": 12.58,
+      "rows": 42
+    },
+    "regions/benchmark": {
+      "status": 200,
+      "duration_ms": 7.7,
+      "rows": 0
+    },
+    "carbon/drilldown": {
+      "status": 200,
+      "duration_ms": 15.83,
+      "rows": 500
+    },
+    "insights": {
+      "status": 200,
+      "duration_ms": 25.35,
+      "rows": 3
+    }
+  },
+  "counts": {
+    "core.carbon_observation": 11556,
+    "core.generation_share": 104004,
+    "core.generation_outturn": 12840,
+    "core.demand_observation": 1584,
+    "core.carbon_revision": 108,
+    "ops.ingestion_run": 66,
+    "ops.quality_result": 360,
+    "raw.api_response": "Requires migration/writer role; checked separately."
+  },
+  "performance": {
+    "overview": {
+      "requests": 20,
+      "p50_ms": 16.57,
+      "p95_ms": 22.96,
+      "scope": "local HTTP, warm pool, loaded data"
+    },
+    "carbon/trend": {
+      "requests": 20,
+      "p50_ms": 9.44,
+      "p95_ms": 10.69,
+      "scope": "local HTTP, warm pool, loaded data"
+    },
+    "regions/ranking": {
+      "requests": 20,
+      "p50_ms": 15.66,
+      "p95_ms": 18.64,
+      "scope": "local HTTP, warm pool, loaded data"
+    }
+  },
+  "source_status": [
+    {
+      "id": "carbon",
+      "name": "NESO Carbon Intensity",
+      "url": "https://api.carbonintensity.org.uk",
+      "licence": "CC BY 4.0",
+      "cadence_minutes": 30,
+      "stale_minutes": 120,
+      "observed_at": "2026-10-14 09:00:00+01:00",
+      "last_success_at": "2026-10-14 10:00:28.609341+01:00",
+      "age_minutes": "63.5522044833333333",
+      "stale": false
+    },
+    {
+      "id": "regional",
+      "name": "NESO Regional Intensity",
+      "url": "https://api.carbonintensity.org.uk",
+      "licence": "CC BY 4.0",
+      "cadence_minutes": 30,
+      "stale_minutes": 120,
+      "observed_at": "2026-10-14 09:00:00+01:00",
+      "last_success_at": "2026-10-14 09:58:18.557721+01:00",
+      "age_minutes": "63.5522044833333333",
+      "stale": false
+    },
+    {
+      "id": "mix",
+      "name": "NESO Generation Mix",
+      "url": "https://api.carbonintensity.org.uk",
+      "licence": "CC BY 4.0",
+      "cadence_minutes": 30,
+      "stale_minutes": 120,
+      "observed_at": "2026-10-14 09:00:00+01:00",
+      "last_success_at": "2026-10-14 09:58:17.788623+01:00",
+      "age_minutes": "63.5522044833333333",
+      "stale": false
+    },
+    {
+      "id": "elexon",
+      "name": "Elexon FUELHH",
+      "url": "https://data.elexon.co.uk/bmrs/api/v1",
+      "licence": "Elexon open data",
+      "cadence_minutes": 30,
+      "stale_minutes": 120,
+      "observed_at": "2026-10-14 09:00:00+01:00",
+      "last_success_at": "2026-10-14 09:58:17.593679+01:00",
+      "age_minutes": "63.5522044833333333",
+      "stale": false
+    },
+    {
+      "id": "demand",
+      "name": "NESO Demand Data Update",
+      "url": "https://api.neso.energy",
+      "licence": "NESO Open Data Licence",
+      "cadence_minutes": 1440,
+      "stale_minutes": 17280,
+      "observed_at": "2026-10-14 08:00:00+01:00",
+      "last_success_at": "2026-10-14 09:58:22.821810+01:00",
+      "age_minutes": "123.5522044833333333",
+      "stale": false
+    },
+    {
+      "id": "factors",
+      "name": "NESO Published Carbon Factors",
+      "url": "https://api.carbonintensity.org.uk",
+      "licence": "CC BY 4.0",
+      "cadence_minutes": 1440,
+      "stale_minutes": 43200,
+      "observed_at": "2026-10-14 09:33:21.932873+01:00",
+      "last_success_at": "2026-10-14 09:58:17.690743+01:00",
+      "age_minutes": "30.1866566000000000",
+      "stale": false
+    }
+  ],
+  "query_plan": [
+    {
+      "Plan": {
+        "Node Type": "Aggregate",
+        "Strategy": "Plain",
+        "Partial Mode": "Simple",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 308.99,
+        "Total Cost": 309.0,
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Actual Startup Time": 0.164,
+        "Actual Total Time": 0.165,
+        "Actual Rows": 1.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Shared Hit Blocks": 20,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Bitmap Heap Scan",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "carbon_observation",
+            "Alias": "carbon_observation",
+            "Startup Cost": 24.34,
+            "Total Cost": 307.4,
+            "Plan Rows": 632,
+            "Plan Width": 5,
+            "Actual Startup Time": 0.048,
+            "Actual Total Time": 0.103,
+            "Actual Rows": 623.0,
+            "Actual Loops": 1,
+            "Disabled": false,
+            "Recheck Cond": "((region_id = 0) AND (period_start >= '2026-10-01 00:00:00+01'::timestamp with time zone) AND (period_start < '2026-10-14 00:00:00+01'::timestamp with time zone))",
+            "Rows Removed by Index Recheck": 0,
+            "Exact Heap Blocks": 16,
+            "Lossy Heap Blocks": 0,
+            "Shared Hit Blocks": 20,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Index Name": "carbon_observation_pkey",
+                "Startup Cost": 0.0,
+                "Total Cost": 24.18,
+                "Plan Rows": 632,
+                "Plan Width": 0,
+                "Actual Startup Time": 0.034,
+                "Actual Total Time": 0.034,
+                "Actual Rows": 624.0,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Index Cond": "((region_id = 0) AND (period_start >= '2026-10-01 00:00:00+01'::timestamp with time zone) AND (period_start < '2026-10-14 00:00:00+01'::timestamp with time zone))",
+                "Index Searches": 1,
+                "Shared Hit Blocks": 4,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          }
+        ]
+      },
+      "Planning": {
+        "Shared Hit Blocks": 32,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "Planning Time": 0.263,
+      "Triggers": [],
+      "Execution Time": 0.19
+    }
+  ]
+}

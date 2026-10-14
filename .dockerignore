@@ -1,0 +1,11 @@
+.git
+.env
+.venv
+.local
+**/node_modules
+**/.next
+**/__pycache__
+**/test-results
+**/playwright-report
+docs/contracts/dno-boundaries.json
+

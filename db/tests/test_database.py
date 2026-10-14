@@ -1,0 +1,190 @@
+import os
+from datetime import datetime, timedelta, timezone
+
+import pytest
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import DBAPIError
+
+from apps.api.app.services.analytics import QUERIES
+from pipelines.ingestion.runner import upsert
+from pipelines.transformations.calendar import calendar_rows
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("RUN_DB_TESTS") != "1", reason="Explicit isolated transactional DB integration tests"
+)
+
+
+@pytest.fixture
+def connection(isolated_database):
+    engine = create_engine(isolated_database["migration"])
+    with engine.connect() as conn:
+        transaction = conn.begin()
+        yield conn
+        transaction.rollback()
+    engine.dispose()
+
+
+def make_lineage(conn):
+    a = datetime(1990, 1, 1, tzinfo=timezone.utc)
+    run = conn.execute(
+        text(
+            "INSERT INTO ops.ingestion_run(source_id,window_start,window_end) VALUES('carbon',:a,:b) RETURNING id"
+        ),
+        {"a": a, "b": a + timedelta(days=1)},
+    ).scalar_one()
+    raw = conn.execute(
+        text(
+            "INSERT INTO raw.api_response(run_id,source_id,url,status_code,body,body_hash) VALUES(:r,'carbon','test://isolated-fixture',200,'{}','fixture') RETURNING id"
+        ),
+        {"r": run},
+    ).scalar_one()
+    return a, run, raw
+
+
+def test_idempotent_upsert_and_revision_tracking(connection):
+    a, run, raw = make_lineage(connection)
+    record = dict(
+        region_id=0,
+        period_start=a,
+        period_end=a + timedelta(minutes=30),
+        actual=100,
+        forecast=110,
+        intensity_index="moderate",
+        source_id="carbon",
+        run_id=run,
+        response_id=raw,
+        record_hash="version-1",
+    )
+    assert upsert(connection, "carbon_observation", record, ["region_id", "period_start"]) == "inserted"
+    assert upsert(connection, "carbon_observation", record, ["region_id", "period_start"]) == "duplicates"
+    record.update(actual=105, record_hash="version-2")
+    assert upsert(connection, "carbon_observation", record, ["region_id", "period_start"]) == "updated"
+    row = connection.execute(
+        text("SELECT old_value->>'actual',new_value->>'actual' FROM core.carbon_revision WHERE run_id=:r"),
+        {"r": run},
+    ).one()
+    assert row == ("100", "105")
+
+
+def test_forecast_metrics_exclude_null_pairs(connection):
+    a, run, raw = make_lineage(connection)
+    for index, (actual, forecast) in enumerate([(100, 110), (100, 80), (None, 150)]):
+        record = dict(
+            region_id=0,
+            period_start=a + timedelta(minutes=30 * index),
+            period_end=a + timedelta(minutes=30 * (index + 1)),
+            actual=actual,
+            forecast=forecast,
+            source_id="carbon",
+            run_id=run,
+            response_id=raw,
+            record_hash=str(index),
+        )
+        upsert(connection, "carbon_observation", record, ["region_id", "period_start"])
+    row = (
+        connection.execute(text(QUERIES["forecasts/errors"]), {"start": a, "end": a + timedelta(days=1)})
+        .mappings()
+        .one()
+    )
+    assert float(row["mae"]) == 15
+    assert float(row["bias"]) == -5
+    assert float(row["rmse"]) == pytest.approx(250**0.5)
+    assert row["paired_observations"] == 2
+
+
+def test_constraints_reject_invalid_carbon(connection):
+    a, run, raw = make_lineage(connection)
+    with pytest.raises(DBAPIError), connection.begin_nested():
+        upsert(
+            connection,
+            "carbon_observation",
+            dict(
+                region_id=0,
+                period_start=a,
+                period_end=a + timedelta(minutes=30),
+                actual=-1,
+                forecast=10,
+                source_id="carbon",
+                run_id=run,
+                response_id=raw,
+                record_hash="bad",
+            ),
+            ["region_id", "period_start"],
+        )
+
+
+def test_reader_cannot_write_or_read_raw(isolated_database):
+    engine = create_engine(isolated_database["reader"])
+    with engine.connect() as conn:
+        assert not conn.execute(
+            text("SELECT has_table_privilege(current_user,'core.carbon_observation','INSERT')")
+        ).scalar()
+        assert not conn.execute(text("SELECT has_schema_privilege(current_user,'raw','USAGE')")).scalar()
+    engine.dispose()
+
+
+def test_completeness_counts_missing_not_just_received(connection):
+    a, run, raw = make_lineage(connection)
+    for row in list(calendar_rows(a, a + timedelta(hours=1))):
+        connection.execute(
+            text(
+                "INSERT INTO core.reporting_calendar(period_start,period_end,settlement_date,settlement_period,local_hour,weekday,weekend) VALUES(:period_start,:period_end,:settlement_date,:settlement_period,:local_hour,:weekday,:weekend) ON CONFLICT DO NOTHING"
+            ),
+            row,
+        )
+    record = dict(
+        region_id=0,
+        period_start=a,
+        period_end=a + timedelta(minutes=30),
+        actual=100,
+        forecast=110,
+        source_id="carbon",
+        run_id=run,
+        response_id=raw,
+        record_hash="only-one",
+    )
+    upsert(connection, "carbon_observation", record, ["region_id", "period_start"])
+    row = connection.execute(
+        text(
+            "SELECT expected,usable,completeness FROM mart.v_data_completeness WHERE day='1990-01-01' AND region_id=0"
+        )
+    ).one()
+    assert row == (2, 1, 50)
+
+
+def test_failed_ingestion_keeps_raw_and_does_not_advance_watermark(isolated_database, monkeypatch):
+    from pipelines.clients.official import OfficialClient
+    from pipelines.ingestion import runner
+
+    writer = create_engine(isolated_database["writer"])
+    monkeypatch.setattr(runner, "engine", writer)
+    # Reflect each isolated database independently.
+    monkeypatch.setattr(runner, "metadata", __import__("sqlalchemy").MetaData())
+
+    def interrupted(self, source, start, end):
+        yield "https://test.invalid/isolated", {"data": []}, 200
+        raise TimeoutError("isolated interrupted ingestion")
+
+    monkeypatch.setattr(OfficialClient, "requests", interrupted)
+    a = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    with pytest.raises(TimeoutError):
+        runner.ingest("carbon", a, a + timedelta(days=1))
+    with writer.connect() as conn:
+        assert (
+            conn.execute(
+                text("SELECT count(*) FROM raw.api_response WHERE url='https://test.invalid/isolated'")
+            ).scalar()
+            == 1
+        )
+        assert (
+            conn.execute(text("SELECT status FROM ops.ingestion_run ORDER BY id DESC LIMIT 1")).scalar()
+            == "failed"
+        )
+        assert (
+            conn.execute(
+                text("SELECT count(*) FROM ops.ingestion_watermark WHERE source_id='carbon'")
+            ).scalar()
+            == 0
+        )
+        assert conn.execute(text("SELECT count(*) FROM core.carbon_observation")).scalar() == 0
+    writer.dispose()

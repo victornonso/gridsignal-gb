@@ -1,0 +1,27 @@
+{
+  "source": "NESO GB DNO Licence Areas 20240503",
+  "licence": "NESO Open Data Licence",
+  "url": "https://www.neso.energy/data-portal/gis-boundaries-gb-dno-license-areas",
+  "resource_id": "1c6a7dc0-1b6c-443a-bc67-5f7125649434",
+  "source_sha256": "cb7a55f85b69e3a14619800ca05c1a0a24e151cfa2dc8de7d1b1e6becdbd9964",
+  "source_crs": "EPSG:27700",
+  "output_crs": "EPSG:4326",
+  "simplification_metres": 150,
+  "mapping": {
+    "_A": 10,
+    "_B": 9,
+    "_C": 13,
+    "_D": 6,
+    "_E": 8,
+    "_F": 4,
+    "_G": 3,
+    "_P": 1,
+    "_J": 14,
+    "_K": 7,
+    "_L": 11,
+    "_M": 5,
+    "_N": 2,
+    "_H": 12
+  },
+  "limitations": "Published approximate DNO licence boundaries, not exact service eligibility polygons."
+}

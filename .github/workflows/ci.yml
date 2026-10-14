@@ -1,0 +1,99 @@
+name: GridSignal verification
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  python-database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: gridsignal_db
+          POSTGRES_PASSWORD: ci-test-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gridsignal_db"
+          --health-interval 5s --health-retries 10
+    env:
+      MIGRATION_DATABASE_URL: postgresql+psycopg://postgres:ci-test-password@127.0.0.1/gridsignal_db
+      DATABASE_URL: postgresql+psycopg://gridsignal_writer:ci-writer@127.0.0.1/gridsignal_db
+      READ_DATABASE_URL: postgresql+psycopg://gridsignal_reader:ci-reader@127.0.0.1/gridsignal_db
+      RUN_DB_TESTS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install uv && uv sync --frozen --extra dev
+      - name: Create separated roles
+        env: {PGPASSWORD: ci-test-password}
+        run: |
+          psql -h 127.0.0.1 -U postgres -d gridsignal_db -v ON_ERROR_STOP=1 -c "CREATE ROLE gridsignal_writer LOGIN PASSWORD 'ci-writer'; CREATE ROLE gridsignal_reader LOGIN PASSWORD 'ci-reader';"
+      - run: uv run alembic upgrade head
+      - run: uv run ruff check .
+      - run: uv run pytest -q
+      - run: uv run alembic current
+      - run: docker build -f infrastructure/docker/api.Dockerfile -t gridsignal-api .
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22',cache: npm,cache-dependency-path: apps/dashboard/package-lock.json}
+      - run: npm ci
+        working-directory: apps/dashboard
+      - run: npm run lint
+        working-directory: apps/dashboard
+      - run: npm run build
+        working-directory: apps/dashboard
+      - run: npm run typecheck
+        working-directory: apps/dashboard
+      - run: docker build -t gridsignal-dashboard apps/dashboard
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: {name: frontend-build-logs,path: apps/dashboard/.next/diagnostics}
+
+  end-to-end:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env: {POSTGRES_DB: gridsignal_db,POSTGRES_PASSWORD: ci-test-password}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U postgres -d gridsignal_db" --health-interval 5s --health-retries 10
+    env:
+      MIGRATION_DATABASE_URL: postgresql+psycopg://postgres:ci-test-password@127.0.0.1/gridsignal_db
+      DATABASE_URL: postgresql+psycopg://gridsignal_writer:ci-writer@127.0.0.1/gridsignal_db
+      READ_DATABASE_URL: postgresql+psycopg://gridsignal_reader:ci-reader@127.0.0.1/gridsignal_db
+      CORS_ORIGINS: http://127.0.0.1:3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22',cache: npm,cache-dependency-path: apps/dashboard/package-lock.json}
+      - run: pip install uv && uv sync --frozen --extra dev
+      - env: {PGPASSWORD: ci-test-password}
+        run: psql -h 127.0.0.1 -U postgres -d gridsignal_db -v ON_ERROR_STOP=1 -c "CREATE ROLE gridsignal_writer LOGIN PASSWORD 'ci-writer'; CREATE ROLE gridsignal_reader LOGIN PASSWORD 'ci-reader';"
+      - run: uv run alembic upgrade head
+      - name: Acquire real historical observations
+        run: uv run gridsignal backfill --source all --start 2026-10-01 --end 2026-10-14
+      - run: npm ci && npm run build && npx playwright install --with-deps chromium
+        working-directory: apps/dashboard
+      - name: Start integrated services
+        run: |
+          uv run uvicorn apps.api.app.main:app --host 127.0.0.1 --port 8001 > /tmp/api.log 2>&1 &
+          cd apps/dashboard
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+          PORT=3001 HOSTNAME=127.0.0.1 node .next/standalone/server.js > /tmp/dashboard.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3001 >/dev/null && break; sleep 1; done
+      - run: npx playwright test
+        working-directory: apps/dashboard
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: browser-verification,path: 'apps/dashboard/playwright-report/'}
+
