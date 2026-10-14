@@ -58,4 +58,4 @@ The calendar is an analytical dataset. A continuous expected-interval calendar s
 
 The local verification snapshot measured overview p95 at approximately 28 ms, carbon trend at 10 ms and regional ranking at 20 ms, from 20 sequential warm-pool HTTP requests per route. See the exact sampling scope and query plan in `verification.json`; these measurements are not hosted service guarantees.
 
-The final local suite passed 32 Python/API/database tests and 30 production-browser checks across three device profiles. CI independently started the complete Compose topology and verified that every source ingested successfully and that the dashboard's same-origin API returned a persisted latest-intensity value.
+The final local suite passed 34 Python/API/database tests and 30 production-browser checks across three device profiles. CI independently started the complete Compose topology and verified that every source ingested successfully and that the dashboard's same-origin API returned a persisted latest-intensity value.

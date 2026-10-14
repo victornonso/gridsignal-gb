@@ -45,3 +45,5 @@ The dashboard defaults to a same-origin Next.js rewrite for local API access. In
 
 Compose defines PostgreSQL, migration, API, worker and frontend services, optional pgAdmin, and a backup profile. Cloud deployment requires a persistent PostgreSQL service and worker-capable host. The frontend alone on Vercel is insufficient. Local native PostgreSQL 18 is available as an isolated fallback when Docker Desktop cannot initialise; this does not count as verification of Docker images.
 
+
+The scheduled worker reads persisted watermarks. After a long outage it catches up from the watermark with overlap, bounded to seven days per scheduled cycle and one-day Carbon/Elexon source requests. Empty or rejected windows stop that source’s catch-up so later windows cannot silently advance past the interruption. Recent observations retain the normal reconciliation lookback.

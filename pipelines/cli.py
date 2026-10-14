@@ -7,6 +7,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlalchemy import text
 
 from pipelines.ingestion.runner import SOURCES, engine, ingest
+from pipelines.orchestration.windows import extraction_windows
 
 
 def parse_date(value):
@@ -16,12 +17,20 @@ def parse_date(value):
 
 def refresh(source):
     end = datetime.now(timezone.utc).replace(second=0, microsecond=0)
-    start = end - timedelta(days=2 if source != "demand" else 32)
-    result = ingest(source, start, end)
+    with engine.connect() as conn:
+        watermark = conn.execute(
+            text("SELECT through_at FROM ops.ingestion_watermark WHERE source_id=:source"), {"source": source}
+        ).scalar()
+    results = []
+    for start, stop in extraction_windows(source, end, watermark):
+        result = ingest(source, start, stop)
+        results.append(result)
+        if not result["received"] or result["rejected"]:
+            break
     from pipelines.validation.quality import check_quality
 
     check_quality()
-    return result
+    return results
 
 
 def main():
