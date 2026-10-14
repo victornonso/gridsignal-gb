@@ -34,9 +34,9 @@ Verified locally on 14 October 2026. The production build was served by Next.js 
 
 | Route | Median ms | p95 ms |
 |---|---:|---:|
-| `overview` | 15.15 | 27.95 |
-| `carbon/trend` | 8.01 | 9.81 |
-| `regions/ranking` | 14.2 | 20.26 |
+| `overview` | 15.56 | 19.18 |
+| `carbon/trend` | 9.63 | 11.68 |
+| `regions/ranking` | 14.16 | 18.1 |
 
 The actual query-plan JSON, source timestamps and route-level evidence are in `verification.json`.
 
@@ -68,3 +68,7 @@ A PostgreSQL regression test verifies observation-weighted seven-day windows acr
 Two additional database regression checks confirm that completeness obeys an exclusive partial-day end, and that current-period generation statistics exclude the preceding comparison period. The local Python/API/database total is 34 passing tests; frontend unit tests total 3.
 
 Two orchestration unit tests verify bounded watermark-based recovery after a long outage and half-hour-aligned recent reconciliation windows.
+
+## Final CI result
+
+GitHub Actions run **38545434778**, source commit **565b81a**, passed all four jobs: Python/database, frontend (including its three unit tests), end-to-end browser verification, and complete Docker Compose integration. CI provisioned fresh PostgreSQL 18, applied migrations, ingested official data and verified the running system. No public deployment URL is claimed.

@@ -45,7 +45,7 @@ Last reviewed: 14 October 2026. Status vocabulary: Not started / In progress / I
 | Error/empty/stale states | Tested (desktop) | API-outage test verifies explicit unavailable state and no substitute data |
 | Responsive navigation | Tested | Desktop/tablet/mobile navigation, filters, exports and drilldowns passed; native WebKit was not tested |
 | Accessible tables / focus / reduced motion | Implemented | Semantic tables, skip link, focus CSS, reduced animation; accessibility audit pending |
-| CI lint, test, build, Docker validation | Tested | First full GitHub Actions run 38540112974 passed all three jobs including real backfill, API, 30 browser checks and Docker builds; final refinement run tracked separately |
+| CI lint, test, build, Docker validation | Tested | First full GitHub Actions run 38540112974 passed all three jobs including real backfill, API, 30 browser checks and Docker builds; final run 38545434778 passed all four jobs |
 | Performance evidence | Tested locally | Real 20-request API samples and EXPLAIN output in verification JSON; not a cloud SLA |
 | Documentation and metric catalogue | Implemented | Architecture, contracts, methodology, database-generated dictionary/catalogue, ADR, deployment, README and case study |
 | Production deployment | Blocked | Vercel account available; persistent backend/database/worker host authentication and billing choice needed |
@@ -58,10 +58,12 @@ Dashboard: `http://127.0.0.1:3001`. API docs: `http://127.0.0.1:8001/docs`. Nati
 
 ## Outstanding acceptance work
 
-Local final refinement verification is complete. Push and inspect the final CI result, then deploy the full topology when authenticated persistent hosting and its budget are available. Docker Desktop recovery must not reset or delete the user's existing Docker volumes. Native database verification does not count as a successful Docker build.
+Local verification and final source CI are complete. Deploy the full topology when authenticated persistent hosting and its budget are available. Docker Desktop recovery must not reset or delete the user's existing Docker volumes. Native database verification does not count as a successful Docker build.
 
 ## Verification snapshot
 
 34 local Python/API/database tests passed. The final 30-check production-browser suite also passed (59.4 seconds). The first complete responsive suite passed 30 browser checks, and the first hosted CI run passed all jobs. Database tests now create and remove a separate temporary PostgreSQL database, so even failed-ingestion tests cannot contaminate production operational counters. A real repeated historical carbon window returned 49 duplicates with zero inserts or updates. CSV export now streams all filtered rows from a repeatable-read snapshot. The latest source refinements require the final verification run recorded in `verification-report.md`.
 
 Interactive browser opening is now blocked by a saved browser permission; the final automated run had completed before this rejection. Further browser work requires restoring permission. The final evidence snapshot is in `verification-report.md`.
+
+Final code CI **38545434778** passed all four jobs at source commit **565b81a**. The local suite contains **34 Python/API/database tests**, **3 frontend unit tests**, and the recorded **30 browser checks**. Deployment and hosted operations remain blocked only by hosting access/budget.
