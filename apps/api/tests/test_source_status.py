@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from apps.api.app.config import Settings
 from apps.api.app.services.source_status import classify_source
 
 NOW = datetime(2026, 10, 14, 16, tzinfo=timezone.utc)
@@ -79,3 +80,14 @@ def test_fresh_observations_and_successful_collection_are_current():
     row = source()
     row["stale"] = False
     assert classify_source(row, NOW, 6)["collection_status"] == "current"
+
+
+@pytest.mark.parametrize("value", ["0", "6"])
+def test_collection_interval_accepts_real_environment_strings(monkeypatch, value):
+    monkeypatch.setenv("COLLECTION_INTERVAL_HOURS", value)
+    assert Settings(_env_file=None).collection_interval_hours == int(value)
+
+
+def test_collection_interval_rejects_an_unrepresentable_utc_schedule():
+    with pytest.raises(ValueError):
+        Settings(_env_file=None, collection_interval_hours=5)
