@@ -1,5 +1,5 @@
 import type { EChartsCoreOption } from "echarts/core";
-import type { Row } from "./api";
+import { number, stamp, type Row } from "./api";
 const fuelColours: Record<string, string> = {
   wind: "#57b794",
   solar: "#e4b44e",
@@ -24,6 +24,14 @@ const colours = [
   "#6c7075",
   "#a6adb3",
 ];
+const escapeHtml = (value: unknown) => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+function chartTooltip(input: unknown) {
+  const points = (Array.isArray(input) ? input : [input]) as { axisValue?: unknown; name?: string; seriesName?: string; value?: unknown }[];
+  const first = points[0];
+  const label = first?.axisValue ?? first?.name ?? "";
+  const title = typeof label === "string" && /^\d{4}-\d{2}-\d{2}T/.test(label) ? stamp(label) : label;
+  return [escapeHtml(title), ...points.map(point => `${escapeHtml(point.seriesName || point.name || "Value")}: ${escapeHtml(number(Array.isArray(point.value) ? point.value[point.value.length - 1] : point.value))}`)].join("<br/>");
+}
 const base: EChartsCoreOption = {
   color: colours,
   textStyle: {
@@ -33,6 +41,9 @@ const base: EChartsCoreOption = {
   },
   tooltip: {
     trigger: "axis",
+    formatter: chartTooltip,
+    valueFormatter: (value: unknown) => number(Array.isArray(value) ? value[value.length - 1] : value),
+    axisPointer: { label: { formatter: (params: { value: unknown }) => typeof params.value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(params.value) ? stamp(params.value) : String(params.value) } },
     backgroundColor: "#fff",
     borderColor: "#dce3dd",
     textStyle: { color: "#253c32", fontSize: 12 },
@@ -66,7 +77,7 @@ export function chartOption(
   if (kind === "donut")
     return {
       ...base,
-      tooltip: { trigger: "item", formatter: "{b}: {c}%" },
+      tooltip: { trigger: "item", valueFormatter: (value: unknown) => `${number(value)}%` },
       legend: { bottom: 0 },
       series: [
         {

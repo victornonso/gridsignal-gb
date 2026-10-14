@@ -37,23 +37,35 @@ export async function getData(
   }
   return response.json();
 }
-export function number(value: unknown, digits = 1) {
+export function number(value: unknown, digits = 2) {
   if (value === null || value === undefined || value === "") return "—";
   const n = Number(value);
   return Number.isFinite(n)
-    ? n.toLocaleString("en-GB", { maximumFractionDigits: digits })
+    ? n.toLocaleString("en-GB", { minimumFractionDigits: digits, maximumFractionDigits: digits })
     : String(value);
 }
 export function stamp(value: unknown) {
-  return value
-    ? new Date(String(value)).toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "Europe/London",
-      })
-    : "No observation";
+  if (value === null || value === undefined || value === "") return "No observation";
+  const date = new Date(String(value));
+  if (!Number.isFinite(date.getTime())) return "Unavailable";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hourCycle: "h23", timeZone: "Europe/London", timeZoneName: "short",
+  }).format(date);
+}
+export function tableValue(key: string, value: unknown): string {
+  if (value === null || value === undefined || value === "") return "\u2014";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return stamp(value);
+  if (typeof value === "object") return JSON.stringify(value);
+  const numeric = typeof value === "number" ||
+    (typeof value === "string" && /^-?\d+(?:\.\d+)?$/.test(value));
+  if (numeric) {
+    const count = /(^id$|_id$|^count$|_count$|^rows$|^rows_|_rows$|^hour$|^year$|^settlement_period$|^expected_intervals$|^observed_intervals$)/.test(key);
+    return number(value, count ? 0 : 2);
+  }
+  return String(value);
 }
 export function nextDate(day: string) {
   return new Date(new Date(day + "T12:00:00Z").getTime() + 86400000)

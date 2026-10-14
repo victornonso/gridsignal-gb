@@ -54,7 +54,7 @@ export function RegionalMap({
             formatter: (p: { name: string; value: number }) => {
               const r = q.data.rows.find((r) => String(r.id) === p.name);
               return r
-                ? `${r.name}: ${Number(r.value).toFixed(1)} gCO₂/kWh`
+                ? `${r.name}: ${Number(r.value).toFixed(2)} gCO₂/kWh`
                 : "No observation";
             },
           },

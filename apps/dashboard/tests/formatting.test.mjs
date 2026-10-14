@@ -6,6 +6,8 @@ import {
   nextDate,
   number,
   getData,
+  stamp,
+  tableValue,
 } from "../src/lib/api.ts";
 
 test("British reporting date is independent of device/server timezone", () => {
@@ -21,7 +23,7 @@ test("British date filters span 23 and 25 hours on DST transition days", () => {
 });
 test("Missing values are distinct from genuine zero observations", () => {
   assert.equal(number(null), "—");
-  assert.equal(number(0), "0");
+  assert.equal(number(0), "0.00");
 });
 
 test("Hosted startup pages produce a useful retry message", async (t) => {
@@ -39,4 +41,18 @@ test("Analytics requests preserve cancellation while allowing valid JSON", async
     return Response.json({ rows: [], meta: {} });
   });
   assert.deepEqual(await getData("overview", "", controller.signal), { rows: [], meta: {} });
+});
+
+test("Readable timestamps include year, seconds and the British DST zone", () => {
+  assert.match(stamp("2026-10-14T13:53:46.863728Z"), /14 Oct 2026, 14:53:46 BST/);
+  assert.match(stamp("2026-12-01T13:00:00Z"), /01 Dec 2026, 13:00:00 GMT/);
+  assert.equal(stamp("bad-date"), "Unavailable");
+  assert.equal(tableValue("finished_at", null), "\u2014");
+});
+test("PostgreSQL decimals are rounded; counts remain whole", () => {
+  assert.equal(tableValue("age_minutes", "447.0249951166666667"), "447.02");
+  assert.equal(tableValue("value", 68), "68.00");
+  assert.equal(tableValue("row_count", 17280), "17,280");
+  assert.equal(tableValue("source", "demand"), "demand");
+  assert.match(tableValue("next_scheduled_at", "2026-10-14T18:23:00Z"), /19:23:00 BST/);
 });

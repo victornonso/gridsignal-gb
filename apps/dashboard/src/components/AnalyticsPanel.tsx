@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getData, number, Row } from "@/lib/api";
+import { getData, tableValue, Row } from "@/lib/api";
 import { chartOption } from "@/lib/charts";
 const Chart = dynamic(() => import("./Chart"), {
   ssr: false,
@@ -59,17 +59,7 @@ export function DataTable({
             <tr key={String(r.id ?? r.time ?? i)}>
               {keys.map((k) => (
                 <td key={k}>
-                  {r[k] === null
-                    ? "—"
-                    : typeof r[k] === "boolean"
-                      ? r[k]
-                        ? "Yes"
-                        : "No"
-                      : typeof r[k] === "object"
-                        ? JSON.stringify(r[k])
-                        : typeof r[k] === "number"
-                          ? number(r[k], 2)
-                          : String(r[k])}
+                  {tableValue(k, r[k])}
                 </td>
               ))}
               {onRow && (
