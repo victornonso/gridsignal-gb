@@ -4,7 +4,7 @@ Verified locally on 14 October 2026. The production build was served by Next.js 
 
 ## Completed verification
 
-- 30 Python/API/database tests passed, including real temporary-database migrations, isolated failure/rollback tests, source locks and revision ordering.
+- 32 Python/API/database tests passed, including real temporary-database migrations, isolated failure/rollback tests, source locks and revision ordering.
 - 30 Playwright checks passed against the production build across desktop, tablet and mobile Chromium (59.4 seconds). All seven screens, navigation, date/region/resolution filters, comparisons, operational drilldowns, CSV downloads and explicit outage states passed.
 - 38 analytical API routes returned HTTP 200. Process liveness/readiness and metadata were also checked.
 - Full filtered CSV export returned 336 rows matching the SQL count even when the table request included a limit of 10 and offset of 50.
@@ -64,3 +64,5 @@ Compose integration passed in GitHub Actions runs 38542021445 and 38542328487: t
 ## Timezone regression checks
 
 A PostgreSQL regression test verifies observation-weighted seven-day windows across the 2025 British clock change under a UTC database session. Three frontend unit tests verify British reporting-date labels independently of device timezone, 23/25-hour filter boundaries, and the distinction between missing and genuine zero values. These tests passed locally.
+
+Two additional database regression checks confirm that completeness obeys an exclusive partial-day end, and that current-period generation statistics exclude the preceding comparison period. The local Python/API/database total is 32 passing tests; frontend unit tests total 3.

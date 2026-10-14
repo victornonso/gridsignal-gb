@@ -37,7 +37,7 @@ QUERIES = {
  SELECT period_start,sum(share) FILTER(WHERE low_carbon) AS low_carbon,sum(share) FILTER(WHERE renewable) AS renewable,
  sum(share) FILTER(WHERE fossil) AS fossil FROM mart.v_generation_mix WHERE region_id=:region AND period_start>=:start AND period_start<:end
  GROUP BY period_start) SELECT avg(low_carbon) AS low_carbon,avg(renewable) AS renewable,avg(fossil) AS fossil FROM intervals""",
-    "generation/volatility": """SELECT fuel_id,avg(share) AS mean_share,stddev_samp(share) AS volatility,min(share) AS minimum,max(share) AS maximum,
+    "generation/volatility": """SELECT fuel_id,avg(share) FILTER(WHERE period_start>=:start) AS mean_share,stddev_samp(share) FILTER(WHERE period_start>=:start) AS volatility,min(share) FILTER(WHERE period_start>=:start) AS minimum,max(share) FILTER(WHERE period_start>=:start) AS maximum,
     avg(share) FILTER(WHERE period_start>=:start)-avg(share) FILTER(WHERE period_start<:start) AS change_pp
     FROM core.generation_share WHERE region_id=:region AND period_start>=:start-(CAST(:end AS timestamptz)-CAST(:start AS timestamptz)) AND period_start<:end
     AND (CAST(:fuel AS text) IS NULL OR fuel_id=:fuel) GROUP BY fuel_id ORDER BY volatility DESC NULLS LAST""",
@@ -83,7 +83,12 @@ QUERIES = {
  avg(extract(epoch FROM finished_at-started_at)) AS mean_duration_seconds,
  100.0*count(*) FILTER(WHERE status='failed')/nullif(count(*),0) AS failure_rate
  FROM ops.ingestion_run WHERE started_at>=:start AND started_at<:end""",
-    "operations/completeness": "SELECT day,region_id,expected,received,usable,completeness FROM mart.v_data_completeness WHERE day>=(CAST(:start AS timestamptz) AT TIME ZONE 'Europe/London')::date AND day<(CAST(:end AS timestamptz) AT TIME ZONE 'Europe/London')::date+1 AND region_id=:region ORDER BY day",
+    "operations/completeness": """SELECT cal.settlement_date AS day,:region AS region_id,count(*) AS expected,
+    count(c.period_start) AS received,count(CASE WHEN :region=0 THEN c.actual ELSE c.forecast END) AS usable,
+    round(100.0*count(CASE WHEN :region=0 THEN c.actual ELSE c.forecast END)/nullif(count(*),0),2) AS completeness
+    FROM core.reporting_calendar cal LEFT JOIN core.carbon_observation c ON c.period_start=cal.period_start AND c.region_id=:region
+    WHERE cal.period_start>=:start AND cal.period_end<=least(CAST(:end AS timestamptz),now())
+    GROUP BY cal.settlement_date ORDER BY day""",
     "metadata/fuels": "SELECT * FROM core.fuel_type ORDER BY label",
     "metadata/regions": "SELECT * FROM core.region ORDER BY id",
     "metadata/factors": "SELECT label,gco2_per_kwh,updated_at FROM core.carbon_factor ORDER BY label",

@@ -156,7 +156,12 @@ Dynamic SQL is in `dynamic_query()`; granularity is selected from a fixed whitel
 ### `operations/completeness`
 
 ```sql
-SELECT day,region_id,expected,received,usable,completeness FROM mart.v_data_completeness WHERE day>=(CAST(:start AS timestamptz) AT TIME ZONE 'Europe/London')::date AND day<(CAST(:end AS timestamptz) AT TIME ZONE 'Europe/London')::date+1 AND region_id=:region ORDER BY day
+SELECT cal.settlement_date AS day,:region AS region_id,count(*) AS expected,
+    count(c.period_start) AS received,count(CASE WHEN :region=0 THEN c.actual ELSE c.forecast END) AS usable,
+    round(100.0*count(CASE WHEN :region=0 THEN c.actual ELSE c.forecast END)/nullif(count(*),0),2) AS completeness
+    FROM core.reporting_calendar cal LEFT JOIN core.carbon_observation c ON c.period_start=cal.period_start AND c.region_id=:region
+    WHERE cal.period_start>=:start AND cal.period_end<=least(CAST(:end AS timestamptz),now())
+    GROUP BY cal.settlement_date ORDER BY day
 ```
 
 ## Further analytical outputs

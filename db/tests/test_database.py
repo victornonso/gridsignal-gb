@@ -280,3 +280,66 @@ def test_rolling_days_across_bst_end_do_not_depend_on_server_timezone(connection
     )
     assert float(rows[-2]["rolling_7d"]) == 3.0
     assert float(rows[-1]["rolling_7d"]) == 4.0
+
+
+def test_completeness_obeys_exclusive_partial_day_end(connection):
+    a, run, raw = make_lineage(connection)
+    for row in calendar_rows(a, a + timedelta(hours=1)):
+        connection.execute(
+            text(
+                "INSERT INTO core.reporting_calendar(period_start,period_end,settlement_date,settlement_period,local_hour,weekday,weekend) VALUES(:period_start,:period_end,:settlement_date,:settlement_period,:local_hour,:weekday,:weekend)"
+            ),
+            row,
+        )
+    values = dict(
+        region_id=0,
+        period_start=a,
+        period_end=a + timedelta(minutes=30),
+        actual=100,
+        forecast=110,
+        source_id="carbon",
+        run_id=run,
+        response_id=raw,
+        record_hash="coverage",
+    )
+    upsert(connection, "carbon_observation", values, ["region_id", "period_start"])
+    rows = (
+        connection.execute(
+            text(QUERIES["operations/completeness"]),
+            {"start": a, "end": a + timedelta(minutes=30), "region": 0},
+        )
+        .mappings()
+        .all()
+    )
+    assert len(rows) == 1
+    assert rows[0]["expected"] == 1 and rows[0]["usable"] == 1
+    assert float(rows[0]["completeness"]) == 100
+
+
+def test_generation_statistics_exclude_previous_comparison_period(connection):
+    a, run, raw = make_lineage(connection)
+    for start, share in [(a - timedelta(minutes=30), 80), (a, 20)]:
+        row = dict(
+            region_id=0,
+            period_start=start,
+            period_end=start + timedelta(minutes=30),
+            fuel_id="wind",
+            source_fuel="wind",
+            share=share,
+            source_id="mix",
+            run_id=run,
+            response_id=raw,
+            record_hash=str(share),
+        )
+        upsert(connection, "generation_share", row, ["region_id", "period_start", "fuel_id", "source_id"])
+    row = (
+        connection.execute(
+            text(QUERIES["generation/volatility"]),
+            {"start": a, "end": a + timedelta(minutes=30), "region": 0, "fuel": None},
+        )
+        .mappings()
+        .one()
+    )
+    assert float(row["mean_share"]) == 20
+    assert float(row["minimum"]) == 20 and float(row["maximum"]) == 20
+    assert float(row["change_pp"]) == -60

@@ -1,194 +1,194 @@
 {
-  "verified_at": "2026-10-14T09:19:58.547647+00:00",
+  "verified_at": "2026-10-14T09:40:20.904901+00:00",
   "endpoints": {
     "carbon/latest": {
       "status": 200,
-      "duration_ms": 14.13,
+      "duration_ms": 137.86,
       "rows": 1
     },
     "carbon/distribution": {
       "status": 200,
-      "duration_ms": 11.08,
+      "duration_ms": 10.55,
       "rows": 12
     },
     "carbon/profile": {
       "status": 200,
-      "duration_ms": 9.24,
+      "duration_ms": 9.95,
       "rows": 48
     },
     "carbon/heatmap": {
       "status": 200,
-      "duration_ms": 12.84,
+      "duration_ms": 9.76,
       "rows": 320
     },
     "carbon/comparison": {
       "status": 200,
-      "duration_ms": 10.18,
+      "duration_ms": 7.98,
       "rows": 2
     },
     "generation/mix": {
       "status": 200,
-      "duration_ms": 13.86,
+      "duration_ms": 11.01,
       "rows": 9
     },
     "generation/summary": {
       "status": 200,
-      "duration_ms": 12.62,
+      "duration_ms": 10.78,
       "rows": 1
     },
     "generation/volatility": {
       "status": 200,
-      "duration_ms": 11.36,
+      "duration_ms": 10.16,
       "rows": 9
     },
     "generation/profile": {
       "status": 200,
-      "duration_ms": 28.48,
+      "duration_ms": 20.9,
       "rows": 240
     },
     "demand/summary": {
       "status": 200,
-      "duration_ms": 9.04,
+      "duration_ms": 8.42,
       "rows": 1
     },
     "demand/hourly": {
       "status": 200,
-      "duration_ms": 10.59,
+      "duration_ms": 12.43,
       "rows": 48
     },
     "demand/comparison": {
       "status": 200,
-      "duration_ms": 10.23,
+      "duration_ms": 8.45,
       "rows": 2
     },
     "demand/distribution": {
       "status": 200,
-      "duration_ms": 7.3,
+      "duration_ms": 6.56,
       "rows": 18
     },
     "regions": {
       "status": 200,
-      "duration_ms": 8.17,
+      "duration_ms": 9.82,
       "rows": 18
     },
     "regions/ranking": {
       "status": 200,
-      "duration_ms": 21.69,
+      "duration_ms": 18.1,
       "rows": 14
     },
     "forecasts/errors": {
       "status": 200,
-      "duration_ms": 8.85,
+      "duration_ms": 7.07,
       "rows": 1
     },
     "forecasts/distribution": {
       "status": 200,
-      "duration_ms": 9.18,
+      "duration_ms": 8.97,
       "rows": 15
     },
     "forecasts/hourly": {
       "status": 200,
-      "duration_ms": 9.44,
+      "duration_ms": 8.58,
       "rows": 24
     },
     "forecasts/weekday": {
       "status": 200,
-      "duration_ms": 9.07,
+      "duration_ms": 12.82,
       "rows": 7
     },
     "forecasts/revisions": {
       "status": 200,
-      "duration_ms": 11.85,
+      "duration_ms": 14.21,
       "rows": 108
     },
     "operations/sources": {
       "status": 200,
-      "duration_ms": 9.68,
+      "duration_ms": 7.65,
       "rows": 6
     },
     "operations/ingestion-runs": {
       "status": 200,
-      "duration_ms": 8.48,
+      "duration_ms": 10.16,
       "rows": 0
     },
     "operations/quality": {
       "status": 200,
-      "duration_ms": 8.88,
+      "duration_ms": 12.15,
       "rows": 0
     },
     "operations/health": {
       "status": 200,
-      "duration_ms": 9.27,
+      "duration_ms": 8.45,
       "rows": 1
     },
     "operations/completeness": {
       "status": 200,
-      "duration_ms": 11.03,
+      "duration_ms": 10.51,
       "rows": 14
     },
     "metadata/fuels": {
       "status": 200,
-      "duration_ms": 6.76,
+      "duration_ms": 7.35,
       "rows": 11
     },
     "metadata/regions": {
       "status": 200,
-      "duration_ms": 9.89,
+      "duration_ms": 7.35,
       "rows": 18
     },
     "metadata/factors": {
       "status": 200,
-      "duration_ms": 8.31,
+      "duration_ms": 6.51,
       "rows": 14
     },
     "overview": {
       "status": 200,
-      "duration_ms": 20.44,
+      "duration_ms": 16.85,
       "rows": 1
     },
     "carbon/trend": {
       "status": 200,
-      "duration_ms": 11.18,
+      "duration_ms": 10.31,
       "rows": 14
     },
     "generation/trend": {
       "status": 200,
-      "duration_ms": 19.59,
+      "duration_ms": 14.56,
       "rows": 126
     },
     "generation/outturn": {
       "status": 200,
-      "duration_ms": 37.27,
+      "duration_ms": 25.34,
       "rows": 140
     },
     "demand/profile": {
       "status": 200,
-      "duration_ms": 7.68,
+      "duration_ms": 9.28,
       "rows": 14
     },
     "forecasts/comparison": {
       "status": 200,
-      "duration_ms": 8.04,
+      "duration_ms": 7.85,
       "rows": 14
     },
     "regions/trend": {
       "status": 200,
-      "duration_ms": 11.02,
+      "duration_ms": 14.21,
       "rows": 42
     },
     "regions/benchmark": {
       "status": 200,
-      "duration_ms": 8.4,
+      "duration_ms": 11.08,
       "rows": 0
     },
     "carbon/drilldown": {
       "status": 200,
-      "duration_ms": 24.09,
+      "duration_ms": 27.63,
       "rows": 500
     },
     "insights": {
       "status": 200,
-      "duration_ms": 38.19,
+      "duration_ms": 24.11,
       "rows": 3
     }
   },
@@ -207,20 +207,20 @@
   "performance": {
     "overview": {
       "requests": 20,
-      "p50_ms": 15.15,
-      "p95_ms": 27.95,
+      "p50_ms": 17.32,
+      "p95_ms": 20.54,
       "scope": "local HTTP, warm pool, loaded data"
     },
     "carbon/trend": {
       "requests": 20,
-      "p50_ms": 8.01,
-      "p95_ms": 9.81,
+      "p50_ms": 9.24,
+      "p95_ms": 10.75,
       "scope": "local HTTP, warm pool, loaded data"
     },
     "regions/ranking": {
       "requests": 20,
-      "p50_ms": 14.2,
-      "p95_ms": 20.26,
+      "p50_ms": 15.55,
+      "p95_ms": 19.17,
       "scope": "local HTTP, warm pool, loaded data"
     }
   },
@@ -234,7 +234,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 10:00:28.609341+01:00",
-      "age_minutes": "79.9998109833333333",
+      "age_minutes": "100.3746361666666667",
       "stale": false
     },
     {
@@ -246,7 +246,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:18.557721+01:00",
-      "age_minutes": "79.9998109833333333",
+      "age_minutes": "100.3746361666666667",
       "stale": false
     },
     {
@@ -258,7 +258,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:17.788623+01:00",
-      "age_minutes": "79.9998109833333333",
+      "age_minutes": "100.3746361666666667",
       "stale": false
     },
     {
@@ -270,7 +270,7 @@
       "stale_minutes": 120,
       "observed_at": "2026-10-14 09:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:17.593679+01:00",
-      "age_minutes": "79.9998109833333333",
+      "age_minutes": "100.3746361666666667",
       "stale": false
     },
     {
@@ -282,7 +282,7 @@
       "stale_minutes": 17280,
       "observed_at": "2026-10-14 08:00:00+01:00",
       "last_success_at": "2026-10-14 09:58:22.821810+01:00",
-      "age_minutes": "139.9998109833333333",
+      "age_minutes": "160.3746361666666667",
       "stale": false
     },
     {
@@ -294,7 +294,7 @@
       "stale_minutes": 43200,
       "observed_at": "2026-10-14 09:33:21.932873+01:00",
       "last_success_at": "2026-10-14 09:58:17.690743+01:00",
-      "age_minutes": "46.6342631000000000",
+      "age_minutes": "67.0090882833333333",
       "stale": false
     }
   ],
@@ -310,8 +310,8 @@
         "Total Cost": 309.0,
         "Plan Rows": 1,
         "Plan Width": 32,
-        "Actual Startup Time": 0.245,
-        "Actual Total Time": 0.246,
+        "Actual Startup Time": 0.321,
+        "Actual Total Time": 0.322,
         "Actual Rows": 1.0,
         "Actual Loops": 1,
         "Disabled": false,
@@ -337,8 +337,8 @@
             "Total Cost": 307.4,
             "Plan Rows": 632,
             "Plan Width": 5,
-            "Actual Startup Time": 0.067,
-            "Actual Total Time": 0.147,
+            "Actual Startup Time": 0.131,
+            "Actual Total Time": 0.216,
             "Actual Rows": 623.0,
             "Actual Loops": 1,
             "Disabled": false,
@@ -367,9 +367,9 @@
                 "Total Cost": 24.18,
                 "Plan Rows": 632,
                 "Plan Width": 0,
-                "Actual Startup Time": 0.047,
-                "Actual Total Time": 0.048,
-                "Actual Rows": 624.0,
+                "Actual Startup Time": 0.07,
+                "Actual Total Time": 0.07,
+                "Actual Rows": 623.0,
                 "Actual Loops": 1,
                 "Disabled": false,
                 "Index Cond": "((region_id = 0) AND (period_start >= '2026-10-01 00:00:00+01'::timestamp with time zone) AND (period_start < '2026-10-14 00:00:00+01'::timestamp with time zone))",
@@ -401,9 +401,9 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0
       },
-      "Planning Time": 0.239,
+      "Planning Time": 0.197,
       "Triggers": [],
-      "Execution Time": 0.277
+      "Execution Time": 0.355
     }
   ],
   "runs_by_source": [
