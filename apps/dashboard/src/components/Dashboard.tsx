@@ -38,6 +38,7 @@ import {
   number,
   stamp,
   londonMidnight,
+  reportDate,
   nextDate,
 } from "@/lib/api";
 
@@ -218,8 +219,8 @@ function Workspace() {
   const drill = (value: string) => {
     if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
       update({
-        start: value.slice(0, 10),
-        end: value.slice(0, 10),
+        start: reportDate(value),
+        end: reportDate(value),
         granularity: "half-hour",
         screen: active === "regional" ? "regional" : "carbon",
       });

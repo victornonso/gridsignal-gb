@@ -47,6 +47,8 @@ jobs:
         working-directory: apps/dashboard
       - run: npm run lint
         working-directory: apps/dashboard
+      - run: npm run test:unit
+        working-directory: apps/dashboard
       - run: npm run build
         working-directory: apps/dashboard
       - run: npm run typecheck

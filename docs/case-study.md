@@ -45,3 +45,17 @@ The first complete responsive browser suite passed 30 checks across desktop, tab
 The initial environment runs real PostgreSQL 18 natively because Docker Desktop fails during initialisation. Compose and CI build definitions are present, but container verification is explicitly tracked separately. A full public deployment requires authenticated persistent database/worker hosting; a frontend-only URL is not represented as a working deployed system.
 
 Forecast issue-time vintages are not retrospectively reconstructed. Regional values are estimates. Metered outturn has incomplete embedded coverage. DNO boundaries are approximate and published at a different cadence from analytical observations.
+
+## What the build taught me
+
+Source contracts matter as much as model design: a documented region list omitted an additional GB aggregate, the wrong Elexon date parameter returned a current snapshot, and future demand rows contained zeros that were not outturn. Executing sample requests before modelling prevented those behaviours from becoming analytical assumptions.
+
+Revision order is part of correctness. Elexon publication timestamps now determine which current outturn can replace another, and a database regression test prevents older publications overwriting newer facts. Raw responses and current-state deduplication solve different problems and are both retained.
+
+The calendar is an analytical dataset. A continuous expected-interval calendar supports missing-data denominators and DST mapping, while source timestamps and successful-ingestion timestamps serve different freshness questions. Separating these concepts made operational status substantially more useful.
+
+## Performance and validation
+
+The local verification snapshot measured overview p95 at approximately 28 ms, carbon trend at 10 ms and regional ranking at 20 ms, from 20 sequential warm-pool HTTP requests per route. See the exact sampling scope and query plan in `verification.json`; these measurements are not hosted service guarantees.
+
+The final local suite passed 30 Python/API/database tests and 30 production-browser checks across three device profiles. CI independently started the complete Compose topology and verified that every source ingested successfully and that the dashboard's same-origin API returned a persisted latest-intensity value.

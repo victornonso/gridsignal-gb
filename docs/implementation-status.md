@@ -8,7 +8,7 @@ Last reviewed: 14 October 2026. Status vocabulary: Not started / In progress / I
 | GitHub repository | Implemented | Private `victornonso/gridsignal-gb`; source pushed, first full CI run passed |
 | Python 3.12 environment | Tested | Isolated uv-managed Python 3.12.15 and dependency installation |
 | PostgreSQL 18 provisioning | Tested | Native isolated PostgreSQL 18.6, database and separated roles created automatically |
-| Docker / PostgreSQL container verification | Tested in CI; local Desktop blocked | PostgreSQL 18 service and both image builds passed GitHub Actions; local Compose launch remains blocked by Desktop inference socket |
+| Docker / PostgreSQL container verification | Tested in CI; local Desktop blocked | PostgreSQL 18, migrations, API, worker and dashboard started together in Compose; all six adapters succeeded and the proxied overview returned persisted data. Local Desktop remains blocked separately. |
 | Four schemas, keys, indexes, constraints | Tested | Alembic `0001` and `0002` applied; database integration tests |
 | Raw response preservation | Tested | Real JSONB source responses persisted with run/URL/hash lineage |
 | Carbon national adapter | Tested | Real October 2026 backfill |
@@ -62,6 +62,6 @@ Local final refinement verification is complete. Push and inspect the final CI r
 
 ## Verification snapshot
 
-29 local Python/API/database tests passed. The final 30-check production-browser suite also passed (59.4 seconds). The first complete responsive suite passed 30 browser checks, and the first hosted CI run passed all jobs. Database tests now create and remove a separate temporary PostgreSQL database, so even failed-ingestion tests cannot contaminate production operational counters. A real repeated historical carbon window returned 49 duplicates with zero inserts or updates. CSV export now streams all filtered rows from a repeatable-read snapshot. The latest source refinements require the final verification run recorded in `verification-report.md`.
+30 local Python/API/database tests passed. The final 30-check production-browser suite also passed (59.4 seconds). The first complete responsive suite passed 30 browser checks, and the first hosted CI run passed all jobs. Database tests now create and remove a separate temporary PostgreSQL database, so even failed-ingestion tests cannot contaminate production operational counters. A real repeated historical carbon window returned 49 duplicates with zero inserts or updates. CSV export now streams all filtered rows from a repeatable-read snapshot. The latest source refinements require the final verification run recorded in `verification-report.md`.
 
 Interactive browser opening is now blocked by a saved browser permission; the final automated run had completed before this rejection. Further browser work requires restoring permission. The final evidence snapshot is in `verification-report.md`.

@@ -4,7 +4,7 @@ Verified locally on 14 October 2026. The production build was served by Next.js 
 
 ## Completed verification
 
-- 29 Python/API/database tests passed, including real temporary-database migrations, isolated failure/rollback tests, source locks and revision ordering.
+- 30 Python/API/database tests passed, including real temporary-database migrations, isolated failure/rollback tests, source locks and revision ordering.
 - 30 Playwright checks passed against the production build across desktop, tablet and mobile Chromium (59.4 seconds). All seven screens, navigation, date/region/resolution filters, comparisons, operational drilldowns, CSV downloads and explicit outage states passed.
 - 38 analytical API routes returned HTTP 200. Process liveness/readiness and metadata were also checked.
 - Full filtered CSV export returned 336 rows matching the SQL count even when the table request included a limit of 10 and offset of 50.
@@ -56,3 +56,11 @@ Official NESO Carbon Intensity, regional, mix, factor and demand APIs and Elexon
 ## Remaining operational acceptance
 
 Provision authenticated persistent hosting, migrate and backfill its database, configure exact production origins/secrets, run the worker, deploy the frontend against that API, verify HTTPS and production freshness, configure hosted backup storage/retention and repeat the deployment smoke checks. Native Safari/WebKit was not tested; tablet/mobile checks used Chromium device emulation. Full historical issue-time forecast skill is unsupported because the source does not provide those retained vintages.
+
+## Additional container verification
+
+Compose integration passed in GitHub Actions runs 38542021445 and 38542328487: the entire topology built and started from `.env.example`; readiness and frontend responses succeeded; all six source adapters recorded successful ingestion; the frontend's same-origin overview returned a non-null value from PostgreSQL. Logs are retained as CI artifacts. The final methodology-panel inverse text has a source-verified contrast ratio of 7.62:1 after a small style correction; its local interactive preview was not reopened because browser permission was blocked.
+
+## Timezone regression checks
+
+A PostgreSQL regression test verifies observation-weighted seven-day windows across the 2025 British clock change under a UTC database session. Three frontend unit tests verify British reporting-date labels independently of device timezone, 23/25-hour filter boundaries, and the distinction between missing and genuine zero values. These tests passed locally.

@@ -105,13 +105,14 @@ def dynamic_query(route, filters):
         preceding = (
             "6 days"
             if filters.granularity == "day"
-            else ("6 days 23 hours" if filters.granularity == "hour" else "6 days 23 hours 30 minutes")
+            else ("167 hours" if filters.granularity == "hour" else "167 hours 30 minutes")
         )
         monthly = (
             "29 days"
             if filters.granularity == "day"
-            else ("29 days 23 hours" if filters.granularity == "hour" else "29 days 23 hours 30 minutes")
+            else ("719 hours" if filters.granularity == "hour" else "719 hours 30 minutes")
         )
+        window_order = "time AT TIME ZONE 'Europe/London'" if filters.granularity == "day" else "time"
         return (
             """WITH base AS (
             SELECT cal.period_start,c.actual,c.forecast,
@@ -122,8 +123,8 @@ def dynamic_query(route, filters):
             ) """
             + f""", grouped AS(SELECT {time} AS time,avg(value) AS value,avg(forecast) AS forecast,avg(actual) AS actual,
         min(value) AS minimum,max(value) AS maximum,stddev_samp(value) AS volatility,count(value) AS observations FROM base GROUP BY 1)
-        SELECT *,sum(value*observations) OVER(ORDER BY time RANGE BETWEEN interval '{preceding}' PRECEDING AND CURRENT ROW)/nullif(sum(observations) OVER(ORDER BY time RANGE BETWEEN interval '{preceding}' PRECEDING AND CURRENT ROW),0) AS rolling_7d,
-        sum(value*observations) OVER(ORDER BY time RANGE BETWEEN interval '{monthly}' PRECEDING AND CURRENT ROW)/nullif(sum(observations) OVER(ORDER BY time RANGE BETWEEN interval '{monthly}' PRECEDING AND CURRENT ROW),0) AS rolling_30d,
+        SELECT *,sum(value*observations) OVER(ORDER BY {window_order} RANGE BETWEEN interval '{preceding}' PRECEDING AND CURRENT ROW)/nullif(sum(observations) OVER(ORDER BY {window_order} RANGE BETWEEN interval '{preceding}' PRECEDING AND CURRENT ROW),0) AS rolling_7d,
+        sum(value*observations) OVER(ORDER BY {window_order} RANGE BETWEEN interval '{monthly}' PRECEDING AND CURRENT ROW)/nullif(sum(observations) OVER(ORDER BY {window_order} RANGE BETWEEN interval '{monthly}' PRECEDING AND CURRENT ROW),0) AS rolling_30d,
         value-lag(value) OVER(ORDER BY time) AS change,lead(value) OVER(ORDER BY time) AS next_value FROM grouped ORDER BY time {order} LIMIT :limit OFFSET :offset"""
         )
     if route == "generation/trend":

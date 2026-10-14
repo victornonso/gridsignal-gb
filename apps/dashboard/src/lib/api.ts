@@ -50,6 +50,16 @@ export function nextDate(day: string) {
     .toISOString()
     .slice(0, 10);
 }
+export function reportDate(value: string) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const part = (name: string) => parts.find((p) => p.type === name)?.value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
 export function londonMidnight(day: string) {
   const date = new Date(day + "T00:00:00Z");
   const zone = new Intl.DateTimeFormat("en-GB", {

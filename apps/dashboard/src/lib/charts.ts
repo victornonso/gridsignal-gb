@@ -160,7 +160,19 @@ export function chartOption(
     const groups = [...new Set(rows.map((r) => String(r[category])))];
     return {
       ...base,
-      xAxis: { ...(base.xAxis as object), data: times },
+      xAxis: {
+        ...(base.xAxis as object),
+        data: times,
+        axisLabel: {
+          fontSize: 10,
+          formatter: (v: string) =>
+            new Date(v).toLocaleDateString("en-GB", {
+              timeZone: "Europe/London",
+              day: "numeric",
+              month: "short",
+            }),
+        },
+      },
       series: groups.map((g, i) => ({
         name: kind === "multi" ? `Region ${g}` : g,
         type: "line",
@@ -195,6 +207,7 @@ export function chartOption(
         formatter: (v: string) =>
           v.includes("T")
             ? new Date(v).toLocaleDateString("en-GB", {
+                timeZone: "Europe/London",
                 day: "numeric",
                 month: "short",
               })

@@ -244,3 +244,39 @@ def test_older_elexon_publication_cannot_replace_newer_outturn(connection):
         ).scalar()
         == 200
     )
+
+
+def test_rolling_days_across_bst_end_do_not_depend_on_server_timezone(connection):
+    from zoneinfo import ZoneInfo
+
+    from apps.api.app.schemas.analytics import Filters
+    from apps.api.app.services.analytics import dynamic_query
+
+    _, run, raw = make_lineage(connection)
+    london = ZoneInfo("Europe/London")
+    a = datetime(2025, 10, 22, tzinfo=london)
+    b = datetime(2025, 10, 30, tzinfo=london)
+    connection.execute(text("SET LOCAL TIME ZONE 'UTC'"))
+    connection.execute(text("SELECT core.extend_calendar(:a,:b)"), {"a": a, "b": b})
+    for day in range(8):
+        start = a + timedelta(days=day)
+        row = dict(
+            region_id=0,
+            period_start=start,
+            period_end=start + timedelta(minutes=30),
+            actual=day,
+            forecast=day,
+            source_id="carbon",
+            run_id=run,
+            response_id=raw,
+            record_hash=str(day),
+        )
+        upsert(connection, "carbon_observation", row, ["region_id", "period_start"])
+    filters = Filters(start=a, end=b, granularity="day")
+    rows = (
+        connection.execute(text(dynamic_query("carbon/trend", filters)), filters.model_dump())
+        .mappings()
+        .all()
+    )
+    assert float(rows[-2]["rolling_7d"]) == 3.0
+    assert float(rows[-1]["rolling_7d"]) == 4.0
