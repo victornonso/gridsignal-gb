@@ -13,9 +13,15 @@ No HTTP trigger or public administration endpoint is exposed.
 
 ## Deployment status
 
-Source and automated tests are prepared. The Cloudflare Worker is **not deployed
-or authorised yet**. The GitHub hourly recovery check is enabled independently
-when the accompanying workflow change is pushed.
+Deployed on Workers Free as `gridsignal-refresh-watchdog` on 15 October 2026.
+The production trigger is `47 * * * *` (minute 47 of every hour, UTC).
+GitHub's six-hour collection and hourly catch-up schedules are also enabled.
+
+Production version `46442827` passed a manually triggered scheduled-event test
+at 12:06 UTC, returning `healthy` after validating the encrypted GitHub App
+credentials. All six sources were current at the last source-status check.
+The first timer-driven invocation is due at 12:47 UTC; its delivery has not yet
+been observed. Manual handler verification and timer delivery are separate checks.
 
 ## Machine authentication
 
@@ -23,7 +29,8 @@ Use a GitHub App installed on **only `victornonso/gridsignal-gb`**, with reposit
 Actions read/write and the mandatory read-only metadata permission. No contents
 write, organisation permissions or webhook subscriptions are needed. The Worker
 signs a short-lived App JWT and mints an installation token restricted to this
-repository for each recovery attempt. There is no expiring personal token that
+repository for each check, including healthy checks, so revoked access is detected
+early. There is no expiring personal token that
 requires periodic manual replacement.
 
 Store these in Cloudflare's encrypted Worker secrets:

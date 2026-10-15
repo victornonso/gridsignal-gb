@@ -15,7 +15,7 @@ const healthy = () =>
   }));
 const env = { GITHUB_ACTIONS_TOKEN: "test-only" };
 
-test("complete healthy status skips GitHub calls", async () => {
+test("complete healthy status skips workflow calls with a supplied token", async () => {
   let count = 0;
   assert.deepEqual(
     await checkAndDispatch(env, async () => {
@@ -25,6 +25,26 @@ test("complete healthy status skips GitHub calls", async () => {
     { action: "healthy" },
   );
   assert.equal(count, 1);
+});
+
+test("healthy collections still validate GitHub App authentication", async () => {
+  const { privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const appEnv = {
+    GITHUB_APP_ID: "123",
+    GITHUB_INSTALLATION_ID: "456",
+    GITHUB_APP_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }),
+  };
+  let calls = 0;
+  await assert.rejects(
+    checkAndDispatch(appEnv, async (url) => {
+      calls++;
+      if (url.endsWith("/operations/sources")) return Response.json({ rows: healthy() });
+      assert.equal(url, "https://api.github.com/app/installations/456/access_tokens");
+      return new Response(null, { status: 401 });
+    }),
+    /Installation authentication failed \(401\)/,
+  );
+  assert.equal(calls, 2);
 });
 test("missing or overdue sources need recovery; upstream delay alone does not", () => {
   assert.ok(needsRefresh(healthy().slice(1)));

@@ -107,8 +107,9 @@ export async function checkAndDispatch(env, request = fetch) {
   } catch {
     // A cold or unavailable API must not disable the independent recovery trigger.
   }
-  if (!required) return { action: "healthy" };
+  // Validate machine authentication on every check so revoked access is visible early.
   const token = await repositoryToken(env, request);
+  if (!required) return { action: "healthy" };
   const headers = {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",
