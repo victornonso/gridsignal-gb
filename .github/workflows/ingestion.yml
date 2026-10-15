@@ -1,8 +1,15 @@
 name: Hosted data refresh
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Force a collection or recover only when due
+        type: choice
+        options: [force, due]
+        default: force
   schedule:
     - cron: '23 */6 * * *'
+    - cron: '41 * * * *'
 permissions:
   contents: read
 concurrency:
@@ -21,6 +28,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check whether collection is needed
+        id: guard
+        env:
+          FORCE_REFRESH: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode != 'due') || (github.event_name == 'schedule' && github.event.schedule == '23 */6 * * *') }}
+        run: python tools/refresh_guard.py
       - run: pip install uv && uv sync --frozen --no-dev
+        if: steps.guard.outputs.required == 'true'
       - name: Refresh official observations
+        if: steps.guard.outputs.required == 'true'
         run: uv run python -m pipelines.orchestration.hosted_refresh
