@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { heatmapData, heatmapTooltip } from "../src/lib/heatmap.ts";
 import {
   reportDate,
   londonMidnight,
@@ -24,6 +25,24 @@ test("British date filters span 23 and 25 hours on DST transition days", () => {
 test("Missing values are distinct from genuine zero observations", () => {
   assert.equal(number(null), "—");
   assert.equal(number(0), "0.00");
+});
+
+test("Heatmap cells retain distinct hours and true zeros while leaving missing readings empty", () => {
+  const { days, hours, data } = heatmapData([
+    { day: "2026-10-07", hour: 9, value: "207.5" },
+    { day: "2026-10-07", hour: 10, value: "214" },
+    { day: "2026-10-07", hour: 11, value: null },
+    { day: "2026-10-07", hour: 12, value: 0 },
+  ]);
+  assert.equal(hours.length, 24);
+  assert.deepEqual(data, [[9, 0, 207.5], [10, 0, 214], [12, 0, 0]]);
+  const tooltip = heatmapTooltip({ value: data[0] }, days);
+  assert.match(tooltip, /07 Oct 2026/);
+  assert.match(tooltip, /09:00–10:00/);
+  assert.match(tooltip, /207\.50 gCO₂\/kWh/);
+  assert.doesNotMatch(tooltip, /series/i);
+  assert.match(heatmapTooltip({ value: data[1] }, days), /214\.00/);
+  assert.match(heatmapTooltip({ value: data[2] }, days), /0\.00/);
 });
 
 test("Hosted startup pages produce a useful retry message", async (t) => {

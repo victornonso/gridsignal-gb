@@ -1,5 +1,6 @@
 import type { EChartsCoreOption } from "echarts/core";
 import { number, stamp, type Row } from "./api";
+import { heatmapData, heatmapDay, heatmapTooltip } from "./heatmap";
 const fuelColours: Record<string, string> = {
   wind: "#57b794",
   solar: "#e4b44e",
@@ -95,13 +96,13 @@ export function chartOption(
       ],
     };
   if (kind === "heatmap") {
-    const days = [...new Set(rows.map((r) => String(r.day)))];
-    const hours = [...new Set(rows.map((r) => String(r.hour)))];
+    const { days, hours, data } = heatmapData(rows.map(row => ({ day: row.day, hour: row.hour, value: row.value })));
     return {
       ...base,
       grid: { left: 80, right: 18, top: 15, bottom: 55 },
-      xAxis: { type: "category", data: hours },
-      yAxis: { type: "category", data: days },
+      tooltip: { ...(base.tooltip as object), trigger: "item", formatter: (input: unknown) => heatmapTooltip(input, days) },
+      xAxis: { type: "category", data: hours.map(hour => `${hour.padStart(2, "0")}:00`) },
+      yAxis: { type: "category", data: days, axisLabel: { formatter: (day: string) => heatmapDay(day, true) } },
       visualMap: {
         min: 0,
         max: 400,
@@ -110,12 +111,9 @@ export function chartOption(
       },
       series: [
         {
+          name: "Carbon intensity",
           type: "heatmap",
-          data: rows.map((r) => [
-            hours.indexOf(String(r.hour)),
-            days.indexOf(String(r.day)),
-            Number(r.value),
-          ]),
+          data,
         },
       ],
     };
