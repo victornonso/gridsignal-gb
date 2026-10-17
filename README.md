@@ -32,7 +32,7 @@ Official APIs → Python adapters → raw PostgreSQL JSONB → validation/quaran
 | API | FastAPI, parameterised SQL, read-only role, pooled connections, OpenAPI |
 | Workspace | Next.js App Router, TypeScript, Tailwind, Apache ECharts, TanStack Query |
 | Verification | Pytest, PostgreSQL integration tests, Playwright desktop/tablet/mobile |
-| Delivery | Docker Compose, GitHub Actions, deployment configurations |
+| Delivery | Docker Compose, GitHub Actions, Cloudflare Workers, deployment configurations |
 
 ## Official sources
 
@@ -80,7 +80,7 @@ Dashboard: `http://127.0.0.1:3001`. API/OpenAPI: `http://127.0.0.1:8001/docs`. D
 
 To run the full topology in containers: `docker compose up --build -d`. The migration service runs before the API/worker. `docker compose --profile tools up -d pgadmin` adds pgAdmin at `http://127.0.0.1:5051`; register host `db`, port `5432`, database `gridsignal_db`, and the appropriate role. Do not expose pgAdmin publicly.
 
-Docker Desktop failed to initialise on the initial build machine. An isolated native PostgreSQL 18 fallback was provisioned and verified there using `tools/local_postgres.py`; its data lives in ignored `.local/pgdata`. Native binaries are not committed. Both Docker image builds and PostgreSQL-container integration checks subsequently passed in GitHub Actions; the local Desktop startup issue remains separate.
+Docker Compose defines the reproducible service topology, with image builds and PostgreSQL-container integration checks in GitHub Actions. For native Windows development, `tools/local_postgres.py` supports an isolated PostgreSQL 18 cluster in ignored `.local/pgdata`; native binaries remain outside the repository.
 
 ## Backfills and operations
 
@@ -133,6 +133,12 @@ Analytical routes are under `/api/v1`: overview, carbon, generation, demand, reg
 
 ## Deployment and documentation
 
-The public workspace runs on Vercel with a Render Free API and Neon Free PostgreSQL 18. GitHub Actions collects official observations every six hours; half-hourly source resolution is preserved. Render can take about a minute to wake after inactivity. Free quotas apply. The repository retains the continuous Docker worker for local development. See [free-tier operations](infrastructure/deployment/free-tier.md) and [hosted verification](docs/hosted-verification.json).
+The public workspace runs on Vercel with a Render Free API and Neon Free PostgreSQL 18. GitHub Actions collects official observations every six hours; half-hourly source resolution is preserved. Hourly catch-up checks and a separate Cloudflare Workers cron evaluate collection status and request due-only recovery. Healthy collections and active workflows are skipped. This supplies independent scheduling while retaining one controlled ingestion execution path.
+
+The Cloudflare Worker uses an encrypted GitHub App private key to obtain short-lived tokens scoped to this repository's Actions permission. It has no database credentials or public administration endpoint. Database writes remain inside the ingestion workflow. See the [watchdog architecture and verification](infrastructure/refresh-watchdog/README.md).
+
+Source publication, observation age and collection status are separate contracts. A successful check does not imply newly published data, and an upstream publication delay alone does not trigger repeated recovery. Source-specific publication-aware collection is the next scheduling stage; the hosted system currently uses six-hour collection rather than matching every half-hour release.
+
+Render can take about a minute to wake after inactivity. Free quotas apply. The repository retains the continuous Docker worker for local development. See [free-tier operations](infrastructure/deployment/free-tier.md), [hosted verification](docs/hosted-verification.json) and the [engineering case study](docs/case-study.md).
 
 See the [repository and code guide](docs/repository-guide.md) for a file-by-file walkthrough. Further references: [deployment guide](infrastructure/deployment/README.md), [architecture](docs/architecture.md), [data dictionary](docs/data-dictionary.md), [metric catalogue](docs/metric-catalogue.md), [methodology](docs/methodology.md) and [implementation status](docs/implementation-status.md).
